@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tools.fileLoader import LoadInts, LoadIntList
+from tools.fileLoader import LoadInts, LoadIntList, LoadLists
 
 
 class TestLoadInts(TestCase):
@@ -36,3 +36,36 @@ class TestLoadIntList(TestCase):
     def test_detect_floats(self):
         with self.assertRaises(ValueError) as context:
             LoadIntList("input/intLIst/hasFloat")
+
+class TestLoadLists(TestCase):
+    def test_load_ints(self):
+        ints = LoadLists("input/lists/123456")
+        self.assertListEqual(ints[0], ["1","2","3"])
+        self.assertListEqual(ints[1], ["4","5","6"])
+
+    def test_load_mix(self):
+        ints = LoadLists("input/lists/abcdef1234")
+        self.assertListEqual(ints[0], ["a", "b", "c", "d"])
+        self.assertListEqual(ints[1], ["e1", "f2"])
+        self.assertListEqual(ints[2], ["1","2","3", "4"])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
