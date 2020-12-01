@@ -133,9 +133,26 @@ def NonSortedIntersection(A: list, B: list, key=None):
 class ListTooShort(Exception):
     pass
 
-def FindSumPair(numbers: list, target: int):
-    numbers.sort()
+def FindSumPairPreSorted(numbers: list, target: int):
+    """
+    Search the sorted list of numbers for a pair of numbers who's
+    value sum to target.
 
+    Providing a non-sorted list will result in undefined behaviour.
+
+    :param numbers: Numbers to be searched, already sorted in ascending order
+    :param target:  The value the pair of numbers must sum to
+
+    :return: The pair of numbers [a, b] which are distinct members of numbers,
+             and which satisfy the conditions:
+                 a + b = target
+                 a <= b
+
+             If no such pair exists, None is returned
+
+             If multiple such pairs exist the pair with the lowest value of a
+             is returned
+    """
     listLen = len(numbers)
     if (listLen < 2):
         raise ListTooShort
@@ -165,8 +182,56 @@ def FindSumPair(numbers: list, target: int):
     else:
         return None
 
+def FindSumPair(numbers: list, target: int):
+    """
+    Wrapper around FindSumPairSorted that handles non-sorted input
 
-def FindSumTrio(numbers: list, target: int):
+    Operation is non-destructive as a shallow copy is taken prior to sorting
+    the input
+
+    :param numbers: Numbers to be searched
+    :param target:  The value the pair of numbers must sum to
+
+    :return: The pair of numbers [a, b] which are distinct members of numbers,
+             and which satisfy the conditions:
+                 a + b = target
+                 a <= b
+
+             If no such pair exists, None is returned
+
+             If multiple such pairs exist the pair with the lowest value of a
+             is returned
+    """
+    sortedNumbers = copy.copy(numbers)
+    sortedNumbers.sort()
+    return FindSumPairPreSorted(sortedNumbers, target)
+
+
+
+def FindSumTrio(unSortedNumbers: list, target: int):
+    """
+    Search the sorted list of numbers for a triplet of numbers who's
+    value sum to target.
+
+    The function accepts an unosrted list of numbers. The operation is
+    non-destructive since a shallow copy of numbers is taken before it is
+    sorted
+
+    :param numbers: Numbers to be searched
+    :param target:  The value the trio of numbers must sum to
+
+    :return: A trio of numbers [a, b, c] which are distinct members of numbers,
+             and which satisfy the conditions:
+                 a + b + c= target
+                 a <= b <= c
+
+             If no such trio exists, None is returned
+
+             If multiple such trios exist the trio with the lowest value of a
+             is returned. And if multiple exist for that value of a, the trio
+             with the lowest value of b is returned
+    """
+    numbers = copy.copy(unSortedNumbers)
     numbers.sort()
 
     listLen = len(numbers)
@@ -178,7 +243,7 @@ def FindSumTrio(numbers: list, target: int):
     while result is None and low < (listLen -2):
         pairs = numbers[low+1:]
         targetPairSum = target - numbers[low]
-        pair = FindSumPair(pairs,targetPairSum)
+        pair = FindSumPairPreSorted(pairs,targetPairSum)
 
         if pair is not None:
             result = [numbers[low], pair[0], pair[1]]

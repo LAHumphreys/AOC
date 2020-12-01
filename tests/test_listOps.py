@@ -1,6 +1,7 @@
 from tools.listOps import NonSortedIntersection, NonSortedMatchGroups, FindSumPair, ListTooShort, FindSumTrio
 from tools.paths import Point, PathPoint
 from unittest import TestCase
+import copy
 
 class TestIntersect(TestCase):
     def test_NoKey(self):
@@ -121,7 +122,9 @@ class TestFindSumPair(TestCase):
 
     def test_MiddleAndLast_SortRequired(self):
         numbers = [13,23,17,1,3,2,5,7,11]
+        backupNumbers = copy.copy(numbers)
         self.assertListEqual(FindSumPair(numbers, 16), [3,13])
+        self.assertListEqual(numbers, backupNumbers)
 
     def test_PuzzleInput(self):
         numbers = [1721, 979, 366, 299, 675, 1456]
@@ -148,7 +151,9 @@ class TestFindSumTrio(TestCase):
 
     def test_MiddleAndLast_SortRequired(self):
         numbers = [13,11,7,1,3,2,14,5]
+        backupNumbers = copy.copy(numbers)
         self.assertListEqual(FindSumTrio(numbers, 23), [2,7,14])
+        self.assertListEqual(numbers, backupNumbers)
 
     def test_PuzzleInput(self):
         numbers = [1721, 979, 366, 299, 675, 1456]
