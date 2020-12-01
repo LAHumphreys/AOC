@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tools.combinations import Generate, GenerateAscending, MinValueMismatch
+from tools.combinations import Generate, GenerateAscending, MinValueMismatch, MaxValueMismatch
 
 
 class TestGenerate_Simple(TestCase):
@@ -354,3 +354,117 @@ class TestGenerateAscending_MinValue(TestCase):
     def test_MinValue_TooLong(self):
         self.assertRaises(MinValueMismatch, lambda : GenerateAscending(4, [1,2,3], minValue=[1,2,3,4,5]))
 
+    def test_MinValue_IsMaxVal(self):
+        expected = [[3, 3, 3, 3]]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[3,3,3,3]), expected)
+
+    def test_MinValue_IsMidValue(self):
+        expected = [
+            [2, 2, 3, 3],
+            [2, 3, 3, 3],
+
+            [3, 3, 3, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[2,2,3,3]), expected)
+
+    def test_MinValue_IsMinValue(self):
+        expected = [
+            [1, 1, 1, 1],
+            [1, 1, 1, 2],
+            [1, 1, 1, 3],
+            [1, 1, 2, 2],
+            [1, 1, 2, 3],
+            [1, 1, 3, 3],
+            [1, 2, 2, 2],
+            [1, 2, 2, 3],
+            [1, 2, 3, 3],
+            [1, 3, 3, 3],
+
+            [2, 2, 2, 2],
+            [2, 2, 2, 3],
+            [2, 2, 3, 3],
+            [2, 3, 3, 3],
+
+            [3, 3, 3, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[1,1,1,1]), expected)
+
+class TestGenerateAscending_MaxValue(TestCase):
+
+    def test_MaxValue_TooShort(self):
+        self.assertRaises(MaxValueMismatch, lambda : GenerateAscending(4, [1,2,3], maxValue=[1,2]))
+
+    def test_MaxValue_TooLong(self):
+        self.assertRaises(MaxValueMismatch, lambda : GenerateAscending(4, [1,2,3], maxValue=[1,2,3,4,5]))
+
+    def test_MaxValue_IsMinVal(self):
+        expected = [[1, 1, 1, 1]]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], maxValue=[1,1,1,1]), expected)
+
+    def test_MaxValue_IsMidVal(self):
+        expected = [
+            [1, 1, 1, 1],
+            [1, 1, 1, 2],
+            [1, 1, 1, 3],
+            [1, 1, 2, 2],
+            [1, 1, 2, 3],
+            [1, 1, 3, 3],
+            [1, 2, 2, 2],
+            [1, 2, 2, 3],
+            [1, 2, 3, 3],
+            [1, 3, 3, 3],
+
+            [2, 2, 2, 2],
+            [2, 2, 2, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], maxValue=[2,2,2,3]), expected)
+
+    def test_MaxValue_IsMaxVal(self):
+        expected = [
+            [1, 1, 1, 1],
+            [1, 1, 1, 2],
+            [1, 1, 1, 3],
+            [1, 1, 2, 2],
+            [1, 1, 2, 3],
+            [1, 1, 3, 3],
+            [1, 2, 2, 2],
+            [1, 2, 2, 3],
+            [1, 2, 3, 3],
+            [1, 3, 3, 3],
+
+            [2, 2, 2, 2],
+            [2, 2, 2, 3],
+            [2, 2, 3, 3],
+            [2, 3, 3, 3],
+
+            [3, 3, 3, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], maxValue=[3,3, 3, 3]), expected)
+
+class TestGenerateAscending_MinMaxValue(TestCase):
+    def test_MinMaxValue_MidRange(self):
+        expected = [
+            [1, 1, 3, 3],
+            [1, 2, 2, 2],
+            [1, 2, 2, 3],
+            [1, 2, 3, 3],
+            [1, 3, 3, 3],
+
+            [2, 2, 2, 2],
+            [2, 2, 2, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[1,1,3,3], maxValue=[2,2,2,3]), expected)
+
+    def test_MinMaxValue_MinIsMax(self):
+        expected = [
+            [1, 3, 3, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[1,3,3,3], maxValue=[1,3,3,3]), expected)
+
+    def test_MinMaxValue_SmallRange(self):
+        expected = [
+            [1, 1, 2, 2],
+            [1, 1, 2, 3],
+            [1, 1, 3, 3],
+        ]
+        self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[1,1,2,2], maxValue=[1,1,3,3]), expected)
