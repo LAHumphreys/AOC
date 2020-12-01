@@ -145,7 +145,8 @@ def FindSumPair(numbers: list, target: int):
     high = 1
     while not found and baseLow < (listLen -1):
         low = baseLow
-        while high > low and (numbers[low] + numbers[high]) > target:
+
+        while high > (low+1) and (numbers[low] + numbers[high]) > target:
             high -= 1
 
         while high < (listLen-1) and (numbers[low] + numbers[high]) < target:
@@ -154,7 +155,7 @@ def FindSumPair(numbers: list, target: int):
         while low < (high-1) and (numbers[low] + numbers[high]) > target:
             low += 1
 
-        if low < high and (numbers[low] + numbers[high]) == target:
+        if (numbers[low] + numbers[high]) == target:
             found = True
         else:
             baseLow += 1
