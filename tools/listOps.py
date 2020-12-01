@@ -169,9 +169,6 @@ def FindSumPairPreSorted(numbers: list, target: int):
         while high < (listLen-1) and (numbers[low] + numbers[high]) < target:
             high += 1
 
-        while low < (high-1) and (numbers[low] + numbers[high]) > target:
-            low += 1
-
         if (numbers[low] + numbers[high]) == target:
             found = True
         else:
