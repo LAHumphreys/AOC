@@ -1,4 +1,4 @@
-from tools.listOps import NonSortedIntersection, NonSortedMatchGroups
+from tools.listOps import NonSortedIntersection, NonSortedMatchGroups, FindSumPair, ListTooShort,NoSuchPair
 from tools.paths import Point, PathPoint
 from unittest import TestCase
 
@@ -98,3 +98,31 @@ class TestIntersectGroups(TestCase):
 
         self.assertListEqual(NonSortedMatchGroups(listA, listB, key=key), matches)
 
+class TestFindSumPair(TestCase):
+    def test_EmptyList(self):
+        self.assertRaises(ListTooShort, lambda : FindSumPair([] , 0))
+        self.assertRaises(ListTooShort, lambda : FindSumPair([0] , 0))
+
+    def test_First(self):
+        self.assertListEqual(FindSumPair([1,2,3,4], 3), [1,2])
+
+    def test_Last(self):
+        self.assertListEqual(FindSumPair([1,2,3,4], 7), [3,4])
+
+    def test_FirstAndLast(self):
+        self.assertListEqual(FindSumPair([1,2,3,7], 8), [1,7])
+
+    def test_MiddleAndLast(self):
+        numbers = [1,2,3,5,7,11,13,17,23]
+        self.assertListEqual(FindSumPair(numbers, 16), [3,13])
+
+    def test_NoPair(self):
+        self.assertRaises(NoSuchPair, lambda : FindSumPair([1,2,3], -1))
+
+    def test_MiddleAndLast_SortRequired(self):
+        numbers = [13,23,17,1,3,2,5,7,11]
+        self.assertListEqual(FindSumPair(numbers, 16), [3,13])
+
+    def test_PuzzleInput(self):
+        numbers = [1721, 979, 366, 299, 675, 1456]
+        self.assertListEqual(FindSumPair(numbers, 2020), [299, 1721])

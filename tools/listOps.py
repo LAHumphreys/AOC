@@ -130,3 +130,39 @@ def NonSortedIntersection(A: list, B: list, key=None):
 
     return matches
 
+class ListTooShort(Exception):
+    pass
+
+class NoSuchPair(Exception):
+    pass
+
+def FindSumPair(numbers: list, target: int):
+    numbers.sort()
+
+    listLen = len(numbers)
+    if (listLen < 2):
+        raise ListTooShort
+
+    found = False
+    baseLow = 0
+    high = 1
+    while not found and baseLow < (listLen -1):
+        low = baseLow
+        while high > low and (numbers[low] + numbers[high]) > target:
+            high -= 1
+
+        while high < (listLen-1) and (numbers[low] + numbers[high]) < target:
+            high += 1
+
+        while low < (high-1) and (numbers[low] + numbers[high]) > target:
+            low += 1
+
+        if (numbers[low] + numbers[high]) == target:
+            found = True
+        else:
+            baseLow += 1
+
+    if not found:
+        raise NoSuchPair
+
+    return [numbers[low], numbers[high]]
