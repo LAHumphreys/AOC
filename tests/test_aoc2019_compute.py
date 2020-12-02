@@ -1,6 +1,8 @@
+import copy
 from unittest import TestCase
 from aoc2019.compute import Compute, Add, Mul, Instruction, ParamMode, GetParam, Encode, Decode, Input, Output
-from aoc2019.compute import JumpIfTrue, JumpIfFalse, LT, EQ, EncodedCompute
+from aoc2019.compute import JumpIfTrue, JumpIfFalse, LT, EQ, EncodedCompute, ComputePipeline
+from tools.threading import MultiProdSingleConQueue, AsyncRun
 
 class TestInstruction(TestCase):
     def test_OpCode(self):
@@ -327,3 +329,105 @@ class TestComputeBranching(TestCase):
             else:
                 self.assertEqual(output, [1001])
 
+
+class Test_Pipeline(TestCase):
+    trippleProg = [3, 9, 1002, 9, -3, 10, 4, 10, 99, 0, 0]
+    minusThreeProg = [3, 9, 1001, 9, -3, 10, 4, 10, 99, 0, 0]
+    mulTwoInputs = [3, 11, 3, 12, 2, 11, 12, 13, 4, 13, 99, 0, 0, 0]
+
+    def test_Compute_TrippleInput(self):
+        prog = self.trippleProg
+        expected = [3,9,1002,9,-3,10,4,10,99,55, -165]
+        input = [55]
+        output = []
+        self.assertListEqual(Compute(prog, input=input, output=output), expected)
+        self.assertListEqual(input, [])
+        self.assertListEqual(output, [-165])
+
+        input = [10]
+        output = []
+        prog = expected
+        expected = [3,9,1002,9,-3,10,4,10,99,10, -30]
+        self.assertListEqual(Compute(prog, input=input, output=output), expected)
+        self.assertListEqual(input, [])
+        self.assertListEqual(output, [-30])
+
+    def test_Compute_Minus3(self):
+        prog = self.minusThreeProg
+        expected = [3,9,1001,9,-3,10,4,10,99,55, 52]
+        input = [55]
+        output = []
+        self.assertListEqual(Compute(prog, input=input, output=output), expected)
+        self.assertListEqual(input, [])
+        self.assertListEqual(output, [52])
+
+    def test_Compute_Multiply2(self):
+        prog = self.mulTwoInputs
+        expected = [3, 11, 3, 12, 2, 11, 12, 13, 4, 13, 99, 55, 5, 55*5]
+        input = [55, 5]
+        output = []
+        self.assertListEqual(Compute(prog, input=input, output=output), expected)
+        self.assertListEqual(input, [])
+        self.assertListEqual(output, [55*5])
+
+
+    def test_Compute_AsyncIO(self):
+        input = MultiProdSingleConQueue()
+        output = MultiProdSingleConQueue()
+        computer = AsyncRun(lambda : Compute(self.trippleProg, input=input, output=output))
+        input.Push(3)
+        self.assertEqual(output.Pop(), -9)
+        computer.join()
+
+    def test_Compute_Pipeline(self):
+        pipeline = [self.trippleProg, self.minusThreeProg]
+        input = MultiProdSingleConQueue()
+        output = MultiProdSingleConQueue()
+        input.Push(5)
+        ComputePipeline(pipeline, input, output)
+        self.assertEqual(output.Pop(), (5*-3)-3)
+
+    def test_Compute_Pipeline_3(self):
+        pipeline = [self.trippleProg, self.minusThreeProg, self.trippleProg]
+        input = MultiProdSingleConQueue()
+        output = MultiProdSingleConQueue()
+        input.Push(5)
+        ComputePipeline(pipeline, input, output)
+        self.assertEqual(output.Pop(), ((5*-3)-3)*-3)
+
+    def test_Compute_Pipeline_Input(self):
+        pipeline = [self.trippleProg, self.minusThreeProg, self.trippleProg, self.mulTwoInputs]
+        initialInputs = [[5], [], [], [2]]
+        input = MultiProdSingleConQueue()
+        output = MultiProdSingleConQueue()
+        ComputePipeline(pipeline, input, output, initialInputs=initialInputs)
+        self.assertEqual(output.Pop(), 2*(((5*-3)-3)*-3))
+
+
+    def test_Compute_Example1(self):
+        code = [3,26,1001,26,-4,26,3,27,1002,27,2,27,1,27,26,27,4,27,1001,28,-1,28,1005,28,6,99,0,0,5]
+        phases = [9,8,7,6,5]
+        initialInputs = []
+        pipeline = []
+        for phase in phases:
+            pipeline.append(copy.copy(code))
+            initialInputs.append([phase])
+        initialInputs[0].append(0)
+        input = MultiProdSingleConQueue()
+        output = input
+        ComputePipeline(pipeline, input, output, initialInputs=initialInputs)
+        self.assertEqual(output.Pop(), 139629729)
+
+    def test_Compute_Example2(self):
+        code = [3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54, -5,54,1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4, 53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10]
+        phases = [9,7,8,5,6]
+        initialInputs = []
+        pipeline = []
+        for phase in phases:
+            pipeline.append(copy.copy(code))
+            initialInputs.append([phase])
+        initialInputs[0].append(0)
+        input = MultiProdSingleConQueue()
+        output = input
+        ComputePipeline(pipeline, input, output, initialInputs=initialInputs)
+        self.assertEqual(output.Pop(), 18216)

@@ -1,4 +1,5 @@
 from enum import Enum
+from tools.threading import MultiProdSingleConQueue, AsyncRun
 
 class ParamMode(Enum):
     POSITION = 0
@@ -151,3 +152,33 @@ def EncodedCompute(prog, input=[], output=[]):
 def Compute(code, input=[], output=[]):
     prog = EncodedCompute(Encode(code), input=input, output=output)
     return Decode(prog)
+
+
+def ComputePipeline(programs, input, output, initialInputs = None):
+    # TODO: Check sane input
+    lhs = input
+    rhs = MultiProdSingleConQueue()
+    i = 0
+    inputs = []
+    outputs = []
+    while i < len(programs):
+        if initialInputs is not None:
+            for input in initialInputs[i]:
+                lhs.Push(input)
+        inputs.append(lhs)
+        outputs.append(rhs)
+        i += 1
+        lhs = rhs
+        if i == (len(programs) -1):
+            rhs = output
+        else:
+            rhs = MultiProdSingleConQueue()
+
+    i = 0
+    computers = []
+    while i < len(programs):
+        computers.append(AsyncRun(lambda: Compute(programs[i], inputs[i], outputs[i])))
+        i += 1
+
+    for c in computers:
+        c.join()

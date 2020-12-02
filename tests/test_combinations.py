@@ -1,5 +1,5 @@
 from unittest import TestCase
-from tools.combinations import Generate, GenerateAscending, MinValueMismatch, MaxValueMismatch
+from tools.combinations import Generate, GenerateAscending, MinValueMismatch, MaxValueMismatch, GeneratePermutations
 
 
 class TestGenerate_Simple(TestCase):
@@ -468,3 +468,30 @@ class TestGenerateAscending_MinMaxValue(TestCase):
             [1, 1, 3, 3],
         ]
         self.assertListEqual(GenerateAscending(4, [1,2,3], minValue=[1,1,2,2], maxValue=[1,1,3,3]), expected)
+
+class TestPermutations_(TestCase):
+    # Nothing too clever in terms of edge case testing here -
+    # we're leveraging the core python library for the generation
+    def test_Perm_TwoItems(self):
+        expected = [
+            (1, 2),
+            (2, 1),
+        ]
+        self.assertListEqual(GeneratePermutations([1,2],2), expected)
+
+    def test_Perm_TwoFromFour(self):
+        expected = [
+            (1, 2),
+            (1, 3),
+            (1, 4),
+            (2, 1),
+            (2, 3),
+            (2, 4),
+            (3, 1),
+            (3, 2),
+            (3, 4),
+            (4, 1),
+            (4, 2),
+            (4, 3)
+        ]
+        self.assertListEqual(GeneratePermutations([1,2,3,4],2), expected)

@@ -1,3 +1,4 @@
+import itertools
 def ExtendAscending(initialValue, validValues, results):
     minValue = initialValue[-1]
     for v in validValues:
@@ -65,6 +66,10 @@ def ExtendSetAscending(initialValues, validValues, minValue=None, maxValue = Non
         else:
             ExtendAscending(init, validValues, results)
     return results
+
+def GeneratePermutations(validValues: list, choose: int):
+    return [p for p in itertools.permutations(validValues, choose)]
+
 
 def GenerateAscending(length: int, validValues: list, minValue = None, maxValue = None):
     if minValue != None and len(minValue) != length:
