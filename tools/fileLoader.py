@@ -1,3 +1,4 @@
+from tools.dictTools import buildDicts
 def LoadInts(file):
     result = []
     with open(file) as f:
@@ -37,5 +38,13 @@ def LoadPatterns(parserRegex, file):
                 result.append(m.groups())
             else:
                 raise ValueError
+
+    return result
+
+def LoadDicts(file):
+    result = []
+    with (open(file)) as f:
+        lines = f.read()
+        result = buildDicts(lines)
 
     return result
