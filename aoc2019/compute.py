@@ -1,12 +1,16 @@
 from enum import Enum
-from tools.threading import MultiProdSingleConQueue, AsyncRun
+
+from tools.threading import MultiProdSingleConQueue, async_run
+
 
 class ParamMode(Enum):
     POSITION = 0
     IMMEDIATE = 1
 
+
 class UnknownMode(Exception):
     pass
+
 
 class Instruction:
     def __init__(self, code: int):
@@ -14,162 +18,182 @@ class Instruction:
         self.opCode = None
         self.paramModes = None
 
-    def GetOpCode(self):
+    def get_op_code(self):
         if self.opCode is None:
             self.opCode = (self.code % 100)
         return self.opCode
 
-    def GetValue(self):
+    def get_value(self):
         return self.code
 
-    def GetParamMode(self, paramIdx):
+    def get_param_mode(self, param_idx):
         if self.paramModes is None:
             self.paramModes = [None, None, None]
-            workingMask = int(self.code  - self.GetOpCode())
-            workingMask = workingMask //  100
+            working_mask = int(self.code - self.get_op_code())
+            working_mask = working_mask // 100
             for i in range(3):
-                if workingMask < 1 or workingMask%10 == 0:
+                if working_mask < 1 or working_mask % 10 == 0:
                     self.paramModes[i] = ParamMode.POSITION
-                elif workingMask%10 == 1:
+                elif working_mask % 10 == 1:
                     self.paramModes[i] = ParamMode.IMMEDIATE
                 else:
                     raise UnknownMode
-                workingMask = workingMask // 10
+                working_mask = working_mask // 10
 
-        return self.paramModes[paramIdx]
+        return self.paramModes[param_idx]
 
-def GetParam(prog: list, progPtr: int, paramIdx):
+
+def get_param(program: list, program_pointer: int, param_idx):
     val = None
-    ins = prog[progPtr]
-    mode = ins.GetParamMode(paramIdx)
+    ins = program[program_pointer]
+    mode = ins.get_param_mode(param_idx)
     if mode == ParamMode.IMMEDIATE:
-        val = prog[progPtr + 1 + paramIdx].GetValue()
+        val = program[program_pointer + 1 + param_idx].get_value()
     elif mode == ParamMode.POSITION:
-        idx = prog[progPtr + 1 + paramIdx].GetValue()
-        val = prog[idx].GetValue()
+        idx = program[program_pointer + 1 + param_idx].get_value()
+        val = program[idx].get_value()
 
     return val
 
-def Input(prog, progPtr, input):
-    outIndx = prog[progPtr+1].GetValue()
-    prog[outIndx] = Instruction(input.pop(0))
 
-def Output(prog, progPtr, output):
-    val = GetParam(prog, progPtr, 0)
+def op_input(program, program_pointer, inp):
+    out_index = program[program_pointer + 1].get_value()
+    program[out_index] = Instruction(inp.pop(0))
+
+
+def op_output(program, program_pointer, output):
+    val = get_param(program, program_pointer, 0)
     output.append(val)
 
-def Add(prog, progPtr):
-    outIndx = prog[progPtr+3].GetValue()
-    val = GetParam(prog, progPtr, 0) + GetParam(prog, progPtr, 1)
-    prog[outIndx] = Instruction(val)
 
-def LT(prog, progPtr):
-    outIndx = prog[progPtr+3].GetValue()
-    if GetParam(prog, progPtr, 0) < GetParam(prog, progPtr, 1):
-        prog[outIndx] = Instruction(1)
+def op_add(program, program_pointer):
+    out_index = program[program_pointer + 3].get_value()
+    val = get_param(program, program_pointer, 0) + get_param(program, program_pointer, 1)
+    program[out_index] = Instruction(val)
+
+
+def op_less_than(program, program_pointer):
+    out_index = program[program_pointer + 3].get_value()
+    if get_param(program, program_pointer, 0) < get_param(program, program_pointer, 1):
+        program[out_index] = Instruction(1)
     else:
-        prog[outIndx] = Instruction(0)
+        program[out_index] = Instruction(0)
 
-def EQ(prog, progPtr):
-    outIndx = prog[progPtr+3].GetValue()
-    if GetParam(prog, progPtr, 0) == GetParam(prog, progPtr, 1):
-        prog[outIndx] = Instruction(1)
+
+def op_equal(program, program_pointer):
+    out_index = program[program_pointer + 3].get_value()
+    if get_param(program, program_pointer, 0) == get_param(program, program_pointer, 1):
+        program[out_index] = Instruction(1)
     else:
-        prog[outIndx] = Instruction(0)
-
-def Mul(prog, progPtr):
-    outIndx = prog[progPtr+3].GetValue()
-    val = GetParam(prog, progPtr, 0) * GetParam(prog, progPtr, 1)
-    prog[outIndx] = Instruction(val)
-
-def JumpIfTrue(prog, progPtr):
-    testVal = GetParam(prog, progPtr, 0)
-    nextExec = progPtr + 3
-    if testVal != 0:
-        nextExec = GetParam(prog, progPtr, 1)
-
-    return nextExec
-
-def JumpIfFalse(prog, progPtr):
-    testVal = GetParam(prog, progPtr, 0)
-    nextExec = progPtr + 3
-    if testVal == 0:
-        nextExec = GetParam(prog, progPtr, 1)
-
-    return nextExec
+        program[out_index] = Instruction(0)
 
 
-def Encode(prog):
-    encodedProg = []
-    for ins in prog:
-        encodedProg.append(Instruction(ins))
+def op_mul(program, program_pointer):
+    out_index = program[program_pointer + 3].get_value()
+    val = get_param(program, program_pointer, 0) * get_param(program, program_pointer, 1)
+    program[out_index] = Instruction(val)
 
-    return encodedProg
 
-def Decode(prog):
-    decodedProg = []
-    for ins in prog:
-        decodedProg.append(ins.GetValue())
+def op_jump_if_true(program, program_pointer):
+    test_val = get_param(program, program_pointer, 0)
+    next_exec = program_pointer + 3
+    if test_val != 0:
+        next_exec = get_param(program, program_pointer, 1)
 
-    return decodedProg
+    return next_exec
+
+
+def op_jump_if_false(program, program_pointer):
+    test_val = get_param(program, program_pointer, 0)
+    next_exec = program_pointer + 3
+    if test_val == 0:
+        next_exec = get_param(program, program_pointer, 1)
+
+    return next_exec
+
+
+def encode(program):
+    encoded_program = []
+    for ins in program:
+        encoded_program.append(Instruction(ins))
+
+    return encoded_program
+
+
+def decode(program):
+    decoded_program = []
+    for ins in program:
+        decoded_program.append(ins.get_value())
+
+    return decoded_program
+
 
 class UnknownOp(Exception):
     pass
 
-def EncodedCompute(prog, input=[], output=[]):
-    exec = 0
-    op = prog[exec].GetOpCode()
-    while (op != 99):
+
+def encode_compute(program, inp=None, output=None):
+    if output is None:
+        output = []
+    if inp is None:
+        inp = []
+    exec_i = 0
+    op = program[exec_i].get_op_code()
+    while op != 99:
         if op == 1:
-            Add(prog, exec)
-            exec += 4
+            op_add(program, exec_i)
+            exec_i += 4
         elif op == 2:
-            Mul(prog, exec)
-            exec += 4
+            op_mul(program, exec_i)
+            exec_i += 4
         elif op == 3:
-            Input(prog, exec, input)
-            exec += 2
+            op_input(program, exec_i, inp)
+            exec_i += 2
         elif op == 4:
-            Output(prog, exec, output)
-            exec += 2
+            op_output(program, exec_i, output)
+            exec_i += 2
         elif op == 5:
-            exec =  JumpIfTrue(prog, exec)
+            exec_i = op_jump_if_true(program, exec_i)
         elif op == 6:
-            exec = JumpIfFalse(prog, exec)
+            exec_i = op_jump_if_false(program, exec_i)
         elif op == 7:
-            LT(prog, exec)
-            exec += 4
+            op_less_than(program, exec_i)
+            exec_i += 4
         elif op == 8:
-            EQ(prog, exec)
-            exec += 4
+            op_equal(program, exec_i)
+            exec_i += 4
         else:
             raise UnknownOp
 
-        op = prog[exec].GetOpCode()
+        op = program[exec_i].get_op_code()
 
-    return prog
-
-def Compute(code, input=[], output=[]):
-    prog = EncodedCompute(Encode(code), input=input, output=output)
-    return Decode(prog)
+    return program
 
 
-def ComputePipeline(programs, input, output, initialInputs = None):
-    # TODO: Check sane input
-    lhs = input
+def compute(code, inp=None, output=None):
+    if inp is None:
+        inp = []
+    if output is None:
+        output = []
+    program = encode_compute(encode(code), inp=inp, output=output)
+    return decode(program)
+
+
+def compute_pipeline(programs, inp, output, initial_inputs=None):
+    lhs = inp
     rhs = MultiProdSingleConQueue()
     i = 0
     inputs = []
     outputs = []
     while i < len(programs):
-        if initialInputs is not None:
-            for input in initialInputs[i]:
-                lhs.Push(input)
+        if initial_inputs is not None:
+            for inp in initial_inputs[i]:
+                lhs.push(inp)
         inputs.append(lhs)
         outputs.append(rhs)
         i += 1
         lhs = rhs
-        if i == (len(programs) -1):
+        if i == (len(programs) - 1):
             rhs = output
         else:
             rhs = MultiProdSingleConQueue()
@@ -177,7 +201,12 @@ def ComputePipeline(programs, input, output, initialInputs = None):
     i = 0
     computers = []
     while i < len(programs):
-        computers.append(AsyncRun(lambda: Compute(programs[i], inputs[i], outputs[i])))
+        computers.append(
+            async_run(
+                lambda: compute(
+                    programs[i],
+                    inputs[i],
+                    outputs[i])))
         i += 1
 
     for c in computers:

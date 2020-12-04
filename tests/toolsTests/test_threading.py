@@ -1,24 +1,27 @@
-from tools.threading import MultiProdSingleConQueue, AsyncRun, QueueMustPopFront
 from unittest import TestCase
+
+from tools.threading import MultiProdSingleConQueue, async_run, QueueMustPopFront
+
 
 class TestMessaging(TestCase):
     def test_HelloWorld(self):
         queue = MultiProdSingleConQueue()
         result = ""
+
         def con():
             nonlocal queue
             nonlocal result
             result = ""
             word = None
             while word != "!":
-                word = queue.Pop()
+                word = queue.pop()
                 result += word
             return word
 
-        conThread = AsyncRun(con)
-        AsyncRun(lambda: queue.Push("Hello")).join()
-        AsyncRun(lambda: queue.Push(" World"))
-        AsyncRun(lambda: queue.Push("!"))
+        conThread = async_run(con)
+        async_run(lambda: queue.push("Hello")).join()
+        async_run(lambda: queue.push(" World"))
+        async_run(lambda: queue.push("!"))
         conThread.join()
         self.assertEqual(result, "Hello World!")
 
@@ -32,6 +35,7 @@ class TestMessaging(TestCase):
     def test_HelloWorld_ListInterface(self):
         queue = MultiProdSingleConQueue()
         result = ""
+
         def con():
             nonlocal queue
             nonlocal result
@@ -42,9 +46,9 @@ class TestMessaging(TestCase):
                 result += word
             return word
 
-        conThread = AsyncRun(con)
-        AsyncRun(lambda: queue.append("Hello")).join()
-        AsyncRun(lambda: queue.append(" World"))
-        AsyncRun(lambda: queue.append("!"))
+        conThread = async_run(con)
+        async_run(lambda: queue.append("Hello")).join()
+        async_run(lambda: queue.append(" World"))
+        async_run(lambda: queue.append("!"))
         conThread.join()
         self.assertEqual(result, "Hello World!")

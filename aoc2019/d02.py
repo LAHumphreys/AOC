@@ -1,48 +1,56 @@
 import copy
-from tools.fileLoader import LoadIntList
-from aoc2019.compute import Compute, Encode, Instruction, EncodedCompute
 from os.path import dirname, abspath, join
 
-def MakePath(path):
-    dir = dirname(abspath(__file__))
-    return join(dir, path)
+from aoc2019.compute import compute, encode, Instruction, encode_compute
+from tools.fileLoader import load_int_list
 
-def Fixup1202(prog):
-    prog[1] = 12
-    prog[2] = 2
 
-def EncodeAnswer(noun, verb):
-    return (100 * noun + verb)
+def make_path(path):
+    dir_path = dirname(abspath(__file__))
+    return join(dir_path, path)
+
+
+def fixup_1202(program):
+    program[1] = 12
+    program[2] = 2
+
+
+def encode_answer(noun, verb):
+    return 100 * noun + verb
+
 
 class GravAssistCalc:
     def __init__(self):
-        self.baseProg = Encode(LoadIntList(MakePath("input/d02.txt")))
+        self.baseProg = encode(load_int_list(make_path("input/d02.txt")))
 
-    def Compute(self, noun, verb):
-        prog = copy.copy(self.baseProg)
-        prog[1] = Instruction(noun)
-        prog[2] = Instruction(verb)
+    def compute(self, noun, verb):
+        program = copy.copy(self.baseProg)
+        program[1] = Instruction(noun)
+        program[2] = Instruction(verb)
 
-        return EncodedCompute(prog)[0].GetValue()
+        return encode_compute(program)[0].get_value()
 
-def FindVerbNoun(target):
+
+def find_verb_noun(target):
     calc = GravAssistCalc()
     for noun in range(0, 100):
         for verb in range(0, 100):
-            if calc.Compute(noun, verb) == target:
+            if calc.compute(noun, verb) == target:
                 return [verb, noun]
     return [-1, -1]
 
-def FindAndEncode(target):
-    [verb, noun] = FindVerbNoun(target)
-    return EncodeAnswer(noun, verb)
+
+def find_and_encode(target):
+    [verb, noun] = find_verb_noun(target)
+    return encode_answer(noun, verb)
 
 
 if __name__ == "__main__":
-    prog = LoadIntList("input/d02.txt")
-    Fixup1202(prog)
-    Compute(prog)
-    print (prog[0])
-    print (FindAndEncode(19690720))
+    def main():
+        program = load_int_list("input/d02.txt")
+        fixup_1202(program)
+        compute(program)
+        print(program[0])
+        print(find_and_encode(19690720))
 
-
+    main()

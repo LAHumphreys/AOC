@@ -1,6 +1,21 @@
 import copy
 
-def NonSortedMatchGroups(A, B, key=None):
+
+def make_lt(key):
+    if key is not None:
+        return lambda lhs, rhs: key(lhs) < key(rhs)
+    else:
+        return lambda lhs, rhs: lhs < rhs
+
+
+def make_eq(key):
+    if key is not None:
+        return lambda lhs, rhs: key(lhs) == key(rhs)
+    else:
+        return lambda lhs, rhs: lhs == rhs
+
+
+def unsorted_matched_groups(a, b, key=None):
     """
     Return all sets of matching elements. Note that is different to
     NonSortedIntersection which returns a unique list of matching
@@ -9,9 +24,9 @@ def NonSortedMatchGroups(A, B, key=None):
     STOP: If you simply want a list of matches, you may want
           NonSortedIntersection
 
-    :param A:   A list to be compared to list B
-    :param B:   A list to be compared to list A
-    
+    :param a:   A list to be compared to list B
+    :param b:   A list to be compared to list A
+
     :param key: Optional transform of an item, used to sort and check equality
 
     :return: A list where each element representing a matching value. It is a set
@@ -20,67 +35,57 @@ def NonSortedMatchGroups(A, B, key=None):
                  1: A list of items from B which matched the item in [0]
              e.g [([1], [1,1]), ([2,2], [2,2])]
     """
-    listA = copy.copy(A)
-    listB = copy.copy(B)
-    listA.sort(key=key)
-    listB.sort(key=key)
+    list_a = copy.copy(a)
+    list_b = copy.copy(b)
+    list_a.sort(key=key)
+    list_b.sort(key=key)
 
-    ia = 0
-    ib = 0
     matches = []
-    lenA = len(listA)
-    lenB = len(listB)
+    len_a = len(list_a)
+    len_b = len(list_b)
 
-    def lt(lhs, rhs):
-        if key != None:
-            return key(lhs) < key(rhs)
+    lt = make_lt(key)
+    eq = make_eq(key)
+
+    ia = ib = 0
+    while ia < len_a and ib < len_b:
+        a = list_a[ia]
+        b = list_b[ib]
+
+        do_matches = False
+
+        if eq(a, b):
+            do_matches = True
+        elif lt(a, b):
+            ia += 1
         else:
-            return lhs < rhs
+            ib += 1
 
-    def eq(lhs, rhs):
-        if key != None:
-            return key(lhs) == key(rhs)
-        else:
-            return lhs == rhs
-
-    while ia < lenA and ib < lenB:
-        a = listA[ia]
-        b = listB[ib]
-
-        doMatches = False
-
-        if eq(a,b):
-            doMatches = True
-        elif lt(a,b):
-            ia+=1
-        else:
-            ib+=1
-
-        if doMatches:
-            matchesA = []
-            matchesB = []
-            while ia < (lenA) and eq(listA[ia], a):
-                matchesA.append(listA[ia])
+        if do_matches:
+            matches_a = []
+            matches_b = []
+            while ia < len_a and eq(list_a[ia], a):
+                matches_a.append(list_a[ia])
                 ia += 1
 
-            while ib < (lenB) and eq(listB[ib], b):
-                matchesB.append(listB[ib])
+            while ib < len_b and eq(list_b[ib], b):
+                matches_b.append(list_b[ib])
                 ib += 1
 
-            matches.append( (matchesA, matchesB))
+            matches.append((matches_a, matches_b))
 
     return matches
 
 
-def NonSortedIntersection(A: list, B: list, key=None):
+def non_sorted_intersection(a: list, b: list, key=None):
     """
     Look for items that appear in both lists A and B.
 
-    This varient returns a single list of unique matches. If there are duplicate
-    matches, no guarentee is made as to which of the duplicates are returned.
+    This variant returns a single list of unique matches. If there are duplicate
+    matches, no guarantee is made as to which of the duplicates are returned.
 
-    :param A:   A list to be compared to list B
-    :param B:   A list to be compared to list A
+    :param a:   A list to be compared to list B
+    :param b:   A list to be compared to list A
 
     :param key: Optional transform of an item, used to sort and check equality
 
@@ -89,51 +94,44 @@ def NonSortedIntersection(A: list, B: list, key=None):
              removed.
     """
 
-    listA = copy.copy(A)
-    listB = copy.copy(B)
-    listA.sort(key=key)
-    listB.sort(key=key)
+    list_a = copy.copy(a)
+    list_b = copy.copy(b)
+    list_a.sort(key=key)
+    list_b.sort(key=key)
     ia = 0
     ib = 0
     matches = []
-    lenA = len(listA)
-    lenB = len(listB)
+    len_a = len(list_a)
+    len_b = len(list_b)
 
-    def lt(lhs, rhs):
-        if key !=None:
-            return key(lhs) < key(rhs)
-        else:
-            return lhs < rhs
+    lt = make_lt(key)
+    eq = make_eq(key)
 
-    def eq(lhs, rhs):
-        if key != None:
-            return key(lhs) == key(rhs)
-        else:
-            return lhs == rhs
+    while ia < len_a and ib < len_b:
+        a = list_a[ia]
+        b = list_b[ib]
+        while ia < (len_a - 1) and eq(list_a[ia + 1], a):
+            ia += 1
+        while ib < (len_b - 1) and eq(list_b[ib + 1], b):
+            ib += 1
 
-    while ia < lenA and ib < lenB:
-        a = listA[ia]
-        b = listB[ib]
-        while ia < (lenA-1) and eq(listA[ia+1], a):
-            ia+=1
-        while ib < (lenB -1) and eq(listB[ib+1], b):
-            ib+=1
-
-        if eq(a,b):
+        if eq(a, b):
             matches.append(a)
-            ia+=1
-            ib+=1
-        elif lt(a,b):
-            ia+=1
+            ia += 1
+            ib += 1
+        elif lt(a, b):
+            ia += 1
         else:
-            ib+=1
+            ib += 1
 
     return matches
+
 
 class ListTooShort(Exception):
     pass
 
-def FindSumPairPreSorted(numbers: list, target: int):
+
+def find_sum_pair_presorted(numbers: list, target: int):
     """
     Search the sorted list of numbers for a pair of numbers who's
     value sum to target.
@@ -153,33 +151,34 @@ def FindSumPairPreSorted(numbers: list, target: int):
              If multiple such pairs exist the pair with the lowest value of a
              is returned
     """
-    listLen = len(numbers)
-    if (listLen < 2):
+    list_len = len(numbers)
+    if list_len < 2:
         raise ListTooShort
 
     found = False
-    baseLow = 0
+    base_low = 0
     high = 1
-    while not found and baseLow < (listLen -1):
-        low = baseLow
+    while not found and base_low < (list_len - 1):
+        low = base_low
 
-        while high > (low+1) and (numbers[low] + numbers[high]) > target:
+        while high > (low + 1) and (numbers[low] + numbers[high]) > target:
             high -= 1
 
-        while high < (listLen-1) and (numbers[low] + numbers[high]) < target:
+        while high < (list_len - 1) and (numbers[low] + numbers[high]) < target:
             high += 1
 
         if (numbers[low] + numbers[high]) == target:
             found = True
         else:
-            baseLow += 1
+            base_low += 1
 
     if found:
-        return [numbers[low], numbers[high]]
+        return [numbers[base_low], numbers[high]]
     else:
         return None
 
-def FindSumPair(numbers: list, target: int):
+
+def find_sum_pair(numbers: list, target: int):
     """
     Wrapper around FindSumPairSorted that handles non-sorted input
 
@@ -199,22 +198,20 @@ def FindSumPair(numbers: list, target: int):
              If multiple such pairs exist the pair with the lowest value of a
              is returned
     """
-    sortedNumbers = copy.copy(numbers)
-    sortedNumbers.sort()
-    return FindSumPairPreSorted(sortedNumbers, target)
+    sorted_numbers = sorted(copy.copy(numbers))
+    return find_sum_pair_presorted(sorted_numbers, target)
 
 
-
-def FindSumTrio(unSortedNumbers: list, target: int):
+def find_sum_trio(unsorted_numbers: list, target: int):
     """
     Search the sorted list of numbers for a triplet of numbers who's
     value sum to target.
 
-    The function accepts an unosrted list of numbers. The operation is
+    The function accepts an unsorted list of numbers. The operation is
     non-destructive since a shallow copy of numbers is taken before it is
     sorted
 
-    :param numbers: Numbers to be searched
+    :param unsorted_numbers: Numbers to be searched
     :param target:  The value the trio of numbers must sum to
 
     :return: A trio of numbers [a, b, c] which are distinct members of numbers,
@@ -228,19 +225,18 @@ def FindSumTrio(unSortedNumbers: list, target: int):
              is returned. And if multiple exist for that value of a, the trio
              with the lowest value of b is returned
     """
-    numbers = copy.copy(unSortedNumbers)
-    numbers.sort()
+    numbers = sorted(copy.copy(unsorted_numbers))
 
-    listLen = len(numbers)
-    if (listLen < 3):
+    list_len = len(numbers)
+    if list_len < 3:
         raise ListTooShort
 
     low = 0
     result = None
-    while result is None and low < (listLen -2):
-        pairs = numbers[low+1:]
-        targetPairSum = target - numbers[low]
-        pair = FindSumPairPreSorted(pairs,targetPairSum)
+    while result is None and low < (list_len - 2):
+        pairs = numbers[low + 1:]
+        target_pair_sum = target - numbers[low]
+        pair = find_sum_pair_presorted(pairs, target_pair_sum)
 
         if pair is not None:
             result = [numbers[low], pair[0], pair[1]]
@@ -248,4 +244,3 @@ def FindSumTrio(unSortedNumbers: list, target: int):
             low += 1
 
     return result
-

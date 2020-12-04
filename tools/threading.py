@@ -1,36 +1,33 @@
 import threading
 
 
-def AsyncRun(task):
+def async_run(task):
     thread = threading.Thread(target=task)
     thread.start()
     return thread
 
+
 class QueueMustPopFront(Exception):
     pass
+
 
 class MultiProdSingleConQueue:
     def __init__(self):
         self.data = []
         self.condition = threading.Condition()
 
-    def Push(self, item):
+    def push(self, item):
         self.condition.acquire()
         self.data.append(item)
         self.condition.notify(1)
         self.condition.release()
 
-    def pop(self, idx):
-        if idx == 0:
-            return self.Pop()
-        else:
-            raise QueueMustPopFront
-
     def append(self, item):
-        self.Push(item)
+        self.push(item)
 
-    def Pop(self):
-        item = None
+    def pop(self, idx=0):
+        if idx != 0:
+            raise QueueMustPopFront
 
         self.condition.acquire()
         if len(self.data) == 0:

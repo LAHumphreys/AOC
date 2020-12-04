@@ -1,31 +1,34 @@
-from aoc2019.compute import Encode, EncodedCompute, ComputePipeline
-from tools.combinations import GeneratePermutations
-from tools.fileLoader import LoadIntList
-from tools.threading import MultiProdSingleConQueue
 import copy
+
+from aoc2019.compute import encode, encode_compute, compute_pipeline
+from tools.combinations import generate_permutations
+from tools.fileLoader import load_int_list
+from tools.threading import MultiProdSingleConQueue
 
 
 class Amplifier:
     def __init__(self, code):
-        self.prog = Encode(code)
+        self.program = encode(code)
 
-    def amplify(self, phase, inputSignal):
-        prog = copy.copy(self.prog)
-        input = [phase, inputSignal]
+    def amplify(self, phase, input_signal):
+        program = copy.copy(self.program)
+        inp = [phase, input_signal]
         output = []
-        EncodedCompute(prog, input=input, output=output)
+        encode_compute(program, inp=inp, output=output)
 
         return output[0]
 
+
 class PhaseAmpMismatch(Exception):
     pass
+
 
 class Thruster:
     def __init__(self, code):
         self.amp = Amplifier(code)
         self.numAmps = 5
 
-    def ComputeThrust(self, phases):
+    def compute_thrust(self, phases):
         if len(phases) != self.numAmps:
             raise PhaseAmpMismatch
         thrust = 0
@@ -36,48 +39,55 @@ class Thruster:
 
         return thrust
 
+
 class FeedbackThruster:
     def __init__(self, code):
         self.code = code
         self.numAmps = 5
 
-    def ComputeThrust(self, phases):
+    def compute_thrust(self, phases):
         if len(phases) != self.numAmps:
             raise PhaseAmpMismatch
 
-        initialInputs = []
+        initial_inputs = []
         pipeline = []
         for phase in phases:
             pipeline.append(copy.copy(self.code))
-            initialInputs.append([phase])
-        initialInputs[0].append(0)
-        input = MultiProdSingleConQueue()
-        output = input
-        ComputePipeline(pipeline, input, output, initialInputs=initialInputs)
-        return output.Pop()
+            initial_inputs.append([phase])
+        initial_inputs[0].append(0)
+        inp = MultiProdSingleConQueue()
+        output = inp
+        compute_pipeline(pipeline, inp, output, initial_inputs=initial_inputs)
+        return output.pop()
 
-def FindMaxThrust(code):
+
+def find_max_thrust(code):
     thruster = Thruster(code)
-    maxThrust = -1
-    for phase in GeneratePermutations([0,1,2,3,4], 5):
-        thrust = thruster.ComputeThrust(phase)
-        if thrust > maxThrust:
-            maxThrust = thrust
+    max_thrust = -1
+    for phase in generate_permutations([0, 1, 2, 3, 4], 5):
+        thrust = thruster.compute_thrust(phase)
+        if thrust > max_thrust:
+            max_thrust = thrust
 
-    return maxThrust
+    return max_thrust
 
-def FindMaxFeedbackThrust(code):
+
+def find_max_feedback_thrust(code):
     thruster = FeedbackThruster(code)
-    maxThrust = -1
-    for phase in GeneratePermutations([5,6,7,8,9], 5):
-        thrust = thruster.ComputeThrust(phase)
-        if thrust > maxThrust:
-            maxThrust = thrust
+    max_thrust = -1
+    for phase in generate_permutations([5, 6, 7, 8, 9], 5):
+        thrust = thruster.compute_thrust(phase)
+        if thrust > max_thrust:
+            max_thrust = thrust
 
-    return maxThrust
+    return max_thrust
+
 
 if __name__ == "__main__":
-    code = LoadIntList("input/d07.txt")
-    print ("Max thrust: {0}".format(FindMaxThrust(code)))
+    def main():
+        code = load_int_list("input/d07.txt")
+        print("Max thrust: {0}".format(find_max_thrust(code)))
 
-    print ("Max Feedback thrust: {0}".format(FindMaxFeedbackThrust(code)))
+        print("Max Feedback thrust: {0}".format(find_max_feedback_thrust(code)))
+
+    main()

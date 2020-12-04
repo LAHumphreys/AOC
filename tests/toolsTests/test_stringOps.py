@@ -1,11 +1,13 @@
 from unittest import TestCase
-from tools.stringsOps import countChars
+
+from tools.stringsOps import count_chars
+
 
 class TestLoadCharCount(TestCase):
     def test_emptyString(self):
         count = {}
         expected = {}
-        countChars("", count)
+        count_chars("", count)
         self.assertDictEqual(count, expected)
 
     def test_singleChar(self):
@@ -13,7 +15,7 @@ class TestLoadCharCount(TestCase):
         expected = {
             "a": 1
         }
-        countChars("a", count)
+        count_chars("a", count)
         self.assertDictEqual(count, expected)
 
     def test_ManyChars(self):
@@ -26,5 +28,5 @@ class TestLoadCharCount(TestCase):
             "e": 2,
             "f": 2
         }
-        countChars("aabbccddeeffddccbba", count)
+        count_chars("aabbccddeeffddccbba", count)
         self.assertDictEqual(count, expected)
