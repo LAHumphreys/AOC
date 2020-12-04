@@ -1,6 +1,11 @@
 import copy
 from tools.fileLoader import LoadIntList
 from aoc2019.compute import Compute, Encode, Instruction, EncodedCompute
+from os.path import dirname, abspath, join
+
+def MakePath(path):
+    dir = dirname(abspath(__file__))
+    return join(dir, path)
 
 def Fixup1202(prog):
     prog[1] = 12
@@ -11,7 +16,7 @@ def EncodeAnswer(noun, verb):
 
 class GravAssistCalc:
     def __init__(self):
-        self.baseProg = Encode(LoadIntList("input/d02.txt"))
+        self.baseProg = Encode(LoadIntList(MakePath("input/d02.txt")))
 
     def Compute(self, noun, verb):
         prog = copy.copy(self.baseProg)
