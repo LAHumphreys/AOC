@@ -1,13 +1,16 @@
-from tools.dictTools import buildDicts
-def LoadInts(file):
+from tools.dictTools import build_dicts
+
+
+def load_ints(file):
     result = []
     with open(file) as f:
-        for l in f.readlines():
-            result.append(int(l))
+        for lin in f.readlines():
+            result.append(int(lin))
 
     return result
 
-def LoadIntList(file):
+
+def load_int_list(file):
     result = []
     with open(file) as f:
         for tok in f.read().split(","):
@@ -16,7 +19,7 @@ def LoadIntList(file):
     return result
 
 
-def LoadLists(file):
+def load_lists(file):
     result = []
     with open(file) as f:
         for lin in f.readlines():
@@ -29,11 +32,12 @@ def LoadLists(file):
 
     return result
 
-def LoadPatterns(parserRegex, file):
+
+def load_patterns(parser_regex, file):
     result = []
     with open(file) as f:
-        for l in f.readlines():
-            m = parserRegex.search(l)
+        for lin in f.readlines():
+            m = parser_regex.search(lin)
             if m is not None:
                 result.append(m.groups())
             else:
@@ -41,10 +45,10 @@ def LoadPatterns(parserRegex, file):
 
     return result
 
-def LoadDicts(file):
-    result = []
+
+def load_dicts(file):
     with (open(file)) as f:
         lines = f.read()
-        result = buildDicts(lines)
+        result = build_dicts(lines)
 
     return result

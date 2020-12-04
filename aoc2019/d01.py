@@ -1,31 +1,36 @@
-from tools.fileLoader import LoadInts
-def CalcFuel(mass):
-    return max((int(mass/ 3) - 2), 0)
+from tools.fileLoader import load_ints
 
-def CalcRocketFuel(mass):
-    total_fuel = 0;
-    fuel = CalcFuel(mass)
-    while (fuel != 0):
+
+def calc_fuel(mass):
+    return max((int(mass / 3) - 2), 0)
+
+
+def calc_rocket_fuel(mass):
+    total_fuel = 0
+    fuel = calc_fuel(mass)
+    while fuel != 0:
         total_fuel += fuel
-        fuel = CalcFuel(fuel)
+        fuel = calc_fuel(fuel)
 
     return total_fuel
 
-def TotalFuel(masses):
-    fuel = 0;
+
+def calc_total_fuel(masses):
+    fuel = 0
     for m in masses:
-        fuel += CalcFuel(m)
+        fuel += calc_fuel(m)
 
     return fuel
 
-def TotalRocketFuel(masses):
-    fuel = 0;
+
+def total_rocket_fuel(masses):
+    fuel = 0
     for m in masses:
-        fuel += CalcRocketFuel(m)
+        fuel += calc_rocket_fuel(m)
 
     return fuel
 
 
 if __name__ == "__main__":
-    print(TotalFuel(LoadInts("input/d01.txt")))
-    print(TotalRocketFuel(LoadInts("input/d01.txt")))
+    print(calc_total_fuel(load_ints("input/d01.txt")))
+    print(total_rocket_fuel(load_ints("input/d01.txt")))

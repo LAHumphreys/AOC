@@ -1,16 +1,21 @@
-from tools.listOps import FindSumPair, FindSumTrio
-from tools.fileLoader import LoadInts
+from tools.fileLoader import load_ints
+from tools.listOps import find_sum_pair, find_sum_trio
 
-def FindProduct(numbers: list):
-    [low, high]  = FindSumPair(numbers, 2020)
+
+def find_product(numbers: list):
+    [low, high] = find_sum_pair(numbers, 2020)
     return low * high
 
-def FindTrioProduct(numbers: list):
-    [low, mid, high]  = FindSumTrio(numbers, 2020)
+
+def find_trio_product(numbers: list):
+    [low, mid, high] = find_sum_trio(numbers, 2020)
     return low * mid * high
 
-if __name__ == "__main__":
-    numbers = LoadInts("input/d01.txt")
-    print(FindProduct(numbers))
-    print(FindTrioProduct(numbers))
 
+if __name__ == "__main__":
+    def main():
+        numbers = load_ints("input/d01.txt")
+        print(find_product(numbers))
+        print(find_trio_product(numbers))
+
+    main()

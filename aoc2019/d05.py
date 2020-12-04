@@ -1,20 +1,20 @@
 import copy
 
-from tools.fileLoader import LoadIntList
-from aoc2019.compute import Compute, Encode, Instruction, EncodedCompute
+from aoc2019.compute import compute
+from tools.fileLoader import load_int_list
 
 if __name__ == "__main__":
-    code = LoadIntList("input/d05.txt")
-    input = [1]
+    code = load_int_list("inp/d05.txt")
+    inp = [1]
     output = []
-    Compute(copy.copy(code), input=input, output=output)
-    print ("Air con:")
+    compute(copy.copy(code), inp=inp, output=output)
+    print("Air con:")
     for o in output:
         print(o)
 
-    input = [5]
+    inp = [5]
     output = []
-    Compute(copy.copy(code), input=input, output=output)
-    print ("Radiators:")
+    compute(copy.copy(code), inp=inp, output=output)
+    print("Radiators:")
     for o in output:
         print(o)

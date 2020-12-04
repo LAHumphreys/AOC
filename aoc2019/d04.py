@@ -1,53 +1,58 @@
-from tools.combinations import GenerateAscending
+from tools.combinations import generate_ascending
 
-def validValue(val, reqdRun=None):
+
+def valid_value(val, req_run=None):
     valid = False
-    gotReqd = False
+    got_required = False
 
-    if reqdRun is None:
-        gotReqd = True
+    if req_run is None:
+        got_required = True
 
     if len(val) == 6:
         last = val[0]
         run = 1
-        longestRun = 1
+        longest_run = 1
         for v in val[1:]:
             if v == last:
                 run += 1
             elif v < last:
                 return False
             else:
-                if run > longestRun:
-                    longestRun = run
-                if run == reqdRun:
-                    gotReqd = True
+                if run > longest_run:
+                    longest_run = run
+                if run == req_run:
+                    got_required = True
                 run = 1
             last = v
 
-        if run > longestRun:
-            longestRun = run
+        if run > longest_run:
+            longest_run = run
 
-        if run == reqdRun:
-            gotReqd = True
+        if run == req_run:
+            got_required = True
 
-        if longestRun >= 2 and gotReqd:
+        if longest_run >= 2 and got_required:
             valid = True
 
     return valid
 
-def validValue2(val):
-    return validValue(val, reqdRun=2)
+
+def valid_value_2(val):
+    return valid_value(val, req_run=2)
+
 
 if __name__ == "__main__":
-    minValue = [1,5,3,5,1,7]
-    maxValue = [6,3,0,3,9,5]
+    minValue = [1, 5, 3, 5, 1, 7]
+    maxValue = [6, 3, 0, 3, 9, 5]
     numPart1 = 0
     numPart2 = 0
-    for g in GenerateAscending(6, [1,2,3,4,5,6,7,8,9], minValue=minValue, maxValue=maxValue):
-        if validValue(g):
+    for g in generate_ascending(
+            6, [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            min_value=minValue, max_value=maxValue):
+        if valid_value(g):
             numPart1 += 1
 
-        if validValue2(g):
+        if valid_value_2(g):
             numPart2 += 1
 
     print("Part 1: {0}".format(numPart1))
