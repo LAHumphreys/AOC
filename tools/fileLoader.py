@@ -27,3 +27,15 @@ def LoadLists(file):
             result.append(working)
 
     return result
+
+def LoadPatterns(parserRegex, file):
+    result = []
+    with open(file) as f:
+        for l in f.readlines():
+            m = parserRegex.search(l)
+            if m is not None:
+                result.append(m.groups())
+            else:
+                raise ValueError
+
+    return result

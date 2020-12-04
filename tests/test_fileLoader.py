@@ -1,5 +1,6 @@
 from unittest import TestCase
-from tools.fileLoader import LoadInts, LoadIntList, LoadLists
+from tools.fileLoader import LoadInts, LoadIntList, LoadLists, LoadPatterns
+from aoc2020.d02 import  splitRegex
 
 
 class TestLoadInts(TestCase):
@@ -50,6 +51,19 @@ class TestLoadLists(TestCase):
         self.assertListEqual(ints[2], ["1","2","3", "4"])
 
 
+class TestLoadPaterns(TestCase):
+    def test_load_valid(self):
+        groups = LoadPatterns(splitRegex, "input/patterns/validPatterns.txt")
+        expected = [
+           ("1", "3", "a", "abcde"),
+           ("1", "3", "b", "cdefg"),
+           ("2", "9", "c", "ccccccccc")
+        ]
+        self.assertListEqual(groups, expected)
+
+    def test_load_invalidLine(self):
+        with self.assertRaises(ValueError) as context:
+            LoadPatterns(splitRegex, "input/patterns/invalidLine")
 
 
 
