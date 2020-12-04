@@ -1,5 +1,3 @@
-import copy
-
 from unittest import TestCase
 from aoc2019.d02 import Fixup1202, GravAssistCalc, EncodeAnswer, FindVerbNoun, FindAndEncode
 
