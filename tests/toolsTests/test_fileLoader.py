@@ -1,8 +1,11 @@
+import re
 from unittest import TestCase
 
 from aoc2020.d02 import splitRegex
 from tests.toolsTests.tools_common import GetTestFilePath
+from tools.fileLoader import UnexpectedLineFormat, UnexpectedNumberOfRows
 from tools.fileLoader import load_ints, load_int_list, load_lists, load_patterns, load_dicts, load_string_groups
+from tools.fileLoader import load_one
 
 
 class TestLoadInts(TestCase):
@@ -49,6 +52,44 @@ class TestLoadIntList(TestCase):
             load_int_list(GetTestFilePath("input/intLIst/hasFloat"))
 
 
+class TestLoadOne(TestCase):
+    def test_empty(self):
+        path = GetTestFilePath("input/oneLine/empty.txt")
+
+        def loader():
+            load_one(path)
+
+        self.assertRaises(UnexpectedNumberOfRows, loader)
+
+    def test_multiline(self):
+        path = GetTestFilePath("input/oneLine/twoLines.txt")
+
+        def loader():
+            load_one(path)
+
+        self.assertRaises(UnexpectedNumberOfRows, loader)
+
+    def test_hello(self):
+        path = GetTestFilePath("input/oneLine/hello.txt")
+        result = load_one(path)
+        self.assertEqual("hello world!", result)
+
+    def test_hello_valid(self):
+        path = GetTestFilePath("input/oneLine/hello.txt")
+        validator = re.compile("hello.*wor.*")
+        result = load_one(path, validator=validator)
+        self.assertEqual("hello world!", result)
+
+    def test_hello_not_valid(self):
+        path = GetTestFilePath("input/oneLine/hello.txt")
+
+        def loader():
+            validator = re.compile("not a match")
+            load_one(path, validator)
+
+        self.assertRaises(UnexpectedLineFormat, loader)
+
+
 class TestLoadLists(TestCase):
     def test_load_ints(self):
         ints = load_lists(GetTestFilePath("input/lists/123456"))
@@ -73,10 +114,40 @@ class TestLoadPaterns(TestCase):
         ]
         self.assertListEqual(groups, expected)
 
+    def test_load_exact_matches(self):
+        groups = load_patterns(
+            splitRegex,
+            GetTestFilePath("input/patterns/validPatterns.txt"),
+            numResults=3)
+        expected = [
+            ("1", "3", "a", "abcde"),
+            ("1", "3", "b", "cdefg"),
+            ("2", "9", "c", "ccccccccc")
+        ]
+        self.assertListEqual(groups, expected)
+
+    def test_load_lt_matches(self):
+        def loader():
+            load_patterns(
+                splitRegex,
+                GetTestFilePath("input/patterns/validPatterns.txt"),
+                numResults=2)
+
+        self.assertRaises(UnexpectedNumberOfRows, loader)
+
+    def test_load_gt_matches(self):
+        def loader():
+            load_patterns(
+                splitRegex,
+                GetTestFilePath("input/patterns/validPatterns.txt"),
+                numResults=4)
+
+        self.assertRaises(UnexpectedNumberOfRows, loader)
+
     def test_load_invalidLine(self):
-        with self.assertRaises(ValueError) as context:
-            load_patterns(splitRegex, GetTestFilePath(
-                "input/patterns/invalidLine"))
+        with self.assertRaises(UnexpectedLineFormat) as context:
+            load_patterns(splitRegex,
+                          GetTestFilePath("input/patterns/invalidLine"))
 
 
 class TestLoadDicts(TestCase):

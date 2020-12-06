@@ -146,6 +146,69 @@ def non_sorted_intersection(a: list, b: list, key=None):
     return matches
 
 
+class BadDimensions(Exception):
+    """
+    Thrown if the specified number dimensions does not match the data provided
+    """
+    pass
+
+
+def split_to_dims(iterable, dimensions: tuple):
+    """
+    Assemble a multidimensional list by iterating over iterable
+    and placing the items into lists of lengths specified by
+    dimensions.
+
+    e.g split_split_to_dims("1234", (2,2)) => [["1", "2"], ["3", "4"]]
+
+    If desired the final dimension may be left as None to indicate
+    as many copies as can be fulfilled by the input
+
+    e.g split_split_to_dims("123456", (2,None))
+            => [["1", "2"], ["3", "4"], ["5", "6"]]
+
+    :param iterable: The item generator
+    :param dimensions: A tuple of integer dimensions. The first item in the tupple
+                       is the inner most dimension.
+                       The final item may be None, to indicate "any" length
+
+    :return: A list of lists (of lists..), with lengths specified by dimensions
+    """
+    stacking = False
+    result = None
+    if dimensions[-1] == None:
+        stacking = True
+        dimensions = dimensions[:-1]
+        result = []
+
+    number_of_dimensions = len(dimensions)
+    stack = [[] for x in dimensions]
+    for item in iterable:
+        stack[0].append(item)
+        i = 0
+        while i < (number_of_dimensions - 1) and len(stack[i]) == dimensions[i]:
+            stack[i + 1].append(copy.copy(stack[i]))
+            stack[i] = []
+            i += 1
+        if len(stack[-1]) == dimensions[-1]:
+            if stacking:
+                result.append(copy.copy(stack[-1]))
+            elif result is not None:
+                raise BadDimensions
+            else:
+                result = copy.copy(stack[-1])
+            stack[-1] = []
+
+    if result is None:
+        raise BadDimensions
+    else:
+        for dim in stack:
+            if len(dim) != 0:
+                raise BadDimensions
+
+    return result
+
+
 class ListTooShort(Exception):
     pass
 
