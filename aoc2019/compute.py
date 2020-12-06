@@ -15,32 +15,32 @@ class UnknownMode(Exception):
 class Instruction:
     def __init__(self, code: int):
         self.code = code
-        self.opCode = None
-        self.paramModes = None
+        self.op_code = None
+        self.paramater_mode = None
 
     def get_op_code(self):
-        if self.opCode is None:
-            self.opCode = (self.code % 100)
-        return self.opCode
+        if self.op_code is None:
+            self.op_code = (self.code % 100)
+        return self.op_code
 
     def get_value(self):
         return self.code
 
     def get_param_mode(self, param_idx):
-        if self.paramModes is None:
-            self.paramModes = [None, None, None]
+        if self.paramater_mode is None:
+            self.paramater_mode = [None, None, None]
             working_mask = int(self.code - self.get_op_code())
             working_mask = working_mask // 100
             for i in range(3):
                 if working_mask < 1 or working_mask % 10 == 0:
-                    self.paramModes[i] = ParamMode.POSITION
+                    self.paramater_mode[i] = ParamMode.POSITION
                 elif working_mask % 10 == 1:
-                    self.paramModes[i] = ParamMode.IMMEDIATE
+                    self.paramater_mode[i] = ParamMode.IMMEDIATE
                 else:
                     raise UnknownMode
                 working_mask = working_mask // 10
 
-        return self.paramModes[param_idx]
+        return self.paramater_mode[param_idx]
 
 
 def get_param(program: list, program_pointer: int, param_idx):
@@ -138,34 +138,34 @@ def encode_compute(program, inp=None, output=None):
     if inp is None:
         inp = []
     exec_i = 0
-    op = program[exec_i].get_op_code()
-    while op != 99:
-        if op == 1:
+    operation = program[exec_i].get_op_code()
+    while operation != 99:
+        if operation == 1:
             op_add(program, exec_i)
             exec_i += 4
-        elif op == 2:
+        elif operation == 2:
             op_mul(program, exec_i)
             exec_i += 4
-        elif op == 3:
+        elif operation == 3:
             op_input(program, exec_i, inp)
             exec_i += 2
-        elif op == 4:
+        elif operation == 4:
             op_output(program, exec_i, output)
             exec_i += 2
-        elif op == 5:
+        elif operation == 5:
             exec_i = op_jump_if_true(program, exec_i)
-        elif op == 6:
+        elif operation == 6:
             exec_i = op_jump_if_false(program, exec_i)
-        elif op == 7:
+        elif operation == 7:
             op_less_than(program, exec_i)
             exec_i += 4
-        elif op == 8:
+        elif operation == 8:
             op_equal(program, exec_i)
             exec_i += 4
         else:
             raise UnknownOp
 
-        op = program[exec_i].get_op_code()
+        operation = program[exec_i].get_op_code()
 
     return program
 
@@ -179,8 +179,8 @@ def compute(code, inp=None, output=None):
     return decode(program)
 
 
-def compute_pipeline(programs, inp, output, initial_inputs=None):
-    lhs = inp
+def compute_pipeline(programs, initial_input, output, initial_inputs=None):
+    lhs = initial_input
     rhs = MultiProdSingleConQueue()
     i = 0
     inputs = []
@@ -209,5 +209,5 @@ def compute_pipeline(programs, inp, output, initial_inputs=None):
                     outputs[i])))
         i += 1
 
-    for c in computers:
-        c.join()
+    for computer in computers:
+        computer.join()

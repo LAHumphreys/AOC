@@ -1,6 +1,10 @@
 name: Pylint
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
@@ -17,6 +21,10 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pylint
-    - name: Analysing the code with pylint
+        pip install .
+    - name: Analysing tools with pylint
       run: |
-        pylint tools aoc2019 aoc2020 
+        pylint tools
+    - name: Analysing problems with pylint (no docs required)
+      run: |
+        pylint --disable=C0116,C0115,C0114 aoc2019 aoc2020

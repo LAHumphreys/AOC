@@ -1,7 +1,7 @@
 import re
 
-from tools.fileLoader import load_one
-from tools.listOps import count_items_across_groups, split_to_dims
+from tools.file_loader import load_one
+from tools.list_ops import count_items_across_groups, split_to_dims
 
 
 class BadPixel(Exception):
@@ -10,13 +10,13 @@ class BadPixel(Exception):
 
 def render(dims, layers):
     image = []
-    for y in range(dims[1]):
+    for y_coordinate in range(dims[1]):
         row = ""
-        for x in range(dims[0]):
+        for x_coordinate in range(dims[0]):
             layer_index = 0
             pixel = 2
             while pixel == 2 and layer_index < len(layers):
-                pixel = int(layers[layer_index][y][x])
+                pixel = int(layers[layer_index][y_coordinate][x_coordinate])
                 layer_index += 1
 
             if pixel == 1:

@@ -1,8 +1,8 @@
 import copy
 from unittest import TestCase
 
-from tools.listOps import count_items_across_groups, split_to_dims, BadDimensions
-from tools.listOps import non_sorted_intersection, unsorted_matched_groups, find_sum_pair, ListTooShort, find_sum_trio
+from tools.list_ops import count_items_across_groups, split_to_dims, BadDimensions
+from tools.list_ops import non_sorted_intersection, unsorted_matched_groups, find_sum_pair, ListTooShort, find_sum_trio
 from tools.paths import Point, PathPoint
 
 

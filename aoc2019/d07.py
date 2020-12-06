@@ -2,7 +2,7 @@ import copy
 
 from aoc2019.compute import encode, encode_compute, compute_pipeline
 from tools.combinations import generate_permutations
-from tools.fileLoader import load_int_list
+from tools.file_loader import load_int_list
 from tools.threading import MultiProdSingleConQueue
 
 
@@ -10,8 +10,11 @@ class Amplifier:
     def __init__(self, code):
         self.program = encode(code)
 
+    def get_code(self):
+        return copy.copy(self.program)
+
     def amplify(self, phase, input_signal):
-        program = copy.copy(self.program)
+        program = self.get_code()
         inp = [phase, input_signal]
         output = []
         encode_compute(program, inp=inp, output=output)
@@ -26,15 +29,18 @@ class PhaseAmpMismatch(Exception):
 class Thruster:
     def __init__(self, code):
         self.amp = Amplifier(code)
-        self.numAmps = 5
+        self.number_amps = 5
+
+    def get_amp(self):
+        return self.amp
 
     def compute_thrust(self, phases):
-        if len(phases) != self.numAmps:
+        if len(phases) != self.number_amps:
             raise PhaseAmpMismatch
         thrust = 0
         i = 0
-        while i < self.numAmps:
-            thrust = self.amp.amplify(phases[i], thrust)
+        while i < self.number_amps:
+            thrust = self.get_amp().amplify(phases[i], thrust)
             i += 1
 
         return thrust
@@ -43,16 +49,19 @@ class Thruster:
 class FeedbackThruster:
     def __init__(self, code):
         self.code = code
-        self.numAmps = 5
+        self.number_amps = 5
+
+    def get_code(self):
+        return copy.copy(self.code)
 
     def compute_thrust(self, phases):
-        if len(phases) != self.numAmps:
+        if len(phases) != self.number_amps:
             raise PhaseAmpMismatch
 
         initial_inputs = []
         pipeline = []
         for phase in phases:
-            pipeline.append(copy.copy(self.code))
+            pipeline.append(self.get_code())
             initial_inputs.append([phase])
         initial_inputs[0].append(0)
         inp = MultiProdSingleConQueue()

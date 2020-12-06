@@ -2,7 +2,7 @@ import copy
 from unittest import TestCase
 
 from aoc2020.d04 import is_valid_item, UnknownKey, validate_item, is_valid_item_strict
-from tools.dictTools import build_dicts
+from tools.dictionary_tools import build_dicts
 
 
 class Test_ValidPassport(TestCase):

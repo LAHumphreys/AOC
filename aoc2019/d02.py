@@ -2,7 +2,7 @@ import copy
 from os.path import dirname, abspath, join
 
 from aoc2019.compute import compute, encode, Instruction, encode_compute
-from tools.fileLoader import load_int_list
+from tools.file_loader import load_int_list
 
 
 def make_path(path):
@@ -21,10 +21,13 @@ def encode_answer(noun, verb):
 
 class GravAssistCalc:
     def __init__(self):
-        self.baseProg = encode(load_int_list(make_path("input/d02.txt")))
+        self.base_program = encode(load_int_list(make_path("input/d02.txt")))
+
+    def get_code(self):
+        return copy.copy(self.base_program)
 
     def compute(self, noun, verb):
-        program = copy.copy(self.baseProg)
+        program = self.get_code()
         program[1] = Instruction(noun)
         program[2] = Instruction(verb)
 

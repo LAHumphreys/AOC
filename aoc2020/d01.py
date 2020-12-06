@@ -1,5 +1,5 @@
-from tools.fileLoader import load_ints
-from tools.listOps import find_sum_pair, find_sum_trio
+from tools.file_loader import load_ints
+from tools.list_ops import find_sum_pair, find_sum_trio
 
 
 def find_product(numbers: list):

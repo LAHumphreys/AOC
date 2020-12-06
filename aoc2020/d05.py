@@ -1,5 +1,5 @@
 def get_all_seats():
-    return ([x for x in range(128)], [x for x in range(8)])
+    return list(range(128)), list(range(8))
 
 
 class UnknownChop(Exception):
@@ -20,7 +20,7 @@ def chop(seats, code):
 
     if rows % 2 != 0 and code in ["F", "B"]:
         raise UnEvenChop
-    elif cols % 2 != 0 and code in ["L", "R"]:
+    if cols % 2 != 0 and code in ["L", "R"]:
         raise UnEvenChop
 
     if code == "F":
@@ -37,41 +37,41 @@ def chop(seats, code):
     return result
 
 
-def getSeat(code):
+def get_seat(code):
     seats = get_all_seats()
-    for s in code:
-        seats = chop(seats, s)
+    for seat in code:
+        seats = chop(seats, seat)
 
     if len(seats[0]) != 1:
         raise BadCode
-    elif len(seats[1]) != 1:
+    if len(seats[1]) != 1:
         raise BadCode
 
     (row, col) = (seats[0][0], seats[1][0])
     seat_id = row * 8 + col
 
-    return (row, col, seat_id)
+    return row, col, seat_id
 
 
 if __name__ == "__main__":
     def main():
-        with open("input/d05.txt") as f:
+        with open("input/d05.txt") as file_handle:
             max_seat = (0, 0, 0)
-            allSeats = {}
+            all_seats = {}
             for i in range(128):
-                allSeats[i] = []
-            for code in f.readlines():
+                all_seats[i] = []
+            for code in file_handle.readlines():
                 if code[-1] == "\n":
                     code = code[0:-1]
-                this_seat = getSeat(code)
+                this_seat = get_seat(code)
                 if this_seat[2] > max_seat[2]:
                     max_seat = this_seat
-                rowSeats = allSeats[this_seat[0]]
-                rowSeats.append(this_seat[1])
+                row_seats = all_seats[this_seat[0]]
+                row_seats.append(this_seat[1])
             print(max_seat)
 
-            for row in allSeats:
-                cols = allSeats[row]
+            for row in all_seats:
+                cols = all_seats[row]
                 if len(cols) != 8:
                     cols.sort()
                     print("incomplete row {0}: {1}".format(row, cols))

@@ -1,9 +1,9 @@
 import re
 
-from tools.fileLoader import load_patterns
-from tools.stringsOps import count_chars
+from tools.file_loader import load_patterns
+from tools.string_operations import count_chars
 
-splitRegex = re.compile("^([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)$")
+SPLIT_REGEX = re.compile("^([0-9]+)-([0-9]+) ([a-z]): ([a-z]+)$")
 
 
 def is_pass_valid(split_groups):
@@ -47,13 +47,13 @@ def is_pass_valid_part_2(split_groups):
 
 if __name__ == "__main__":
     def main():
-        passes = load_patterns(splitRegex, "input/d02.txt")
+        passes = load_patterns(SPLIT_REGEX, "input/d02.txt")
         count = 0
         count2 = 0
-        for p in passes:
-            if is_pass_valid(p):
+        for pass_to_test in passes:
+            if is_pass_valid(pass_to_test):
                 count += 1
-            if is_pass_valid_part_2(p):
+            if is_pass_valid_part_2(pass_to_test):
                 count2 += 1
         print("Valid: {0}".format(count))
         print("Valid (2): {0}".format(count2))

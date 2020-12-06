@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from tools.dictTools import build_dicts
+from tools.dictionary_tools import build_dicts
 
 
 class Test_DictParser(TestCase):

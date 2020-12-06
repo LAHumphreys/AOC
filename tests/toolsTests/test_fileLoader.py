@@ -1,11 +1,11 @@
 import re
 from unittest import TestCase
 
-from aoc2020.d02 import splitRegex
+from aoc2020.d02 import SPLIT_REGEX
 from tests.toolsTests.tools_common import GetTestFilePath
-from tools.fileLoader import UnexpectedLineFormat, UnexpectedNumberOfRows
-from tools.fileLoader import load_ints, load_int_list, load_lists, load_patterns, load_dicts, load_string_groups
-from tools.fileLoader import load_one
+from tools.file_loader import UnexpectedLineFormat, UnexpectedNumberOfRows
+from tools.file_loader import load_ints, load_int_list, load_lists, load_patterns, load_dicts, load_string_groups
+from tools.file_loader import load_one
 
 
 class TestLoadInts(TestCase):
@@ -105,7 +105,7 @@ class TestLoadLists(TestCase):
 
 class TestLoadPaterns(TestCase):
     def test_load_valid(self):
-        groups = load_patterns(splitRegex, GetTestFilePath(
+        groups = load_patterns(SPLIT_REGEX, GetTestFilePath(
             "input/patterns/validPatterns.txt"))
         expected = [
             ("1", "3", "a", "abcde"),
@@ -116,9 +116,9 @@ class TestLoadPaterns(TestCase):
 
     def test_load_exact_matches(self):
         groups = load_patterns(
-            splitRegex,
+            SPLIT_REGEX,
             GetTestFilePath("input/patterns/validPatterns.txt"),
-            numResults=3)
+            num_results=3)
         expected = [
             ("1", "3", "a", "abcde"),
             ("1", "3", "b", "cdefg"),
@@ -129,24 +129,24 @@ class TestLoadPaterns(TestCase):
     def test_load_lt_matches(self):
         def loader():
             load_patterns(
-                splitRegex,
+                SPLIT_REGEX,
                 GetTestFilePath("input/patterns/validPatterns.txt"),
-                numResults=2)
+                num_results=2)
 
         self.assertRaises(UnexpectedNumberOfRows, loader)
 
     def test_load_gt_matches(self):
         def loader():
             load_patterns(
-                splitRegex,
+                SPLIT_REGEX,
                 GetTestFilePath("input/patterns/validPatterns.txt"),
-                numResults=4)
+                num_results=4)
 
         self.assertRaises(UnexpectedNumberOfRows, loader)
 
     def test_load_invalidLine(self):
         with self.assertRaises(UnexpectedLineFormat) as context:
-            load_patterns(splitRegex,
+            load_patterns(SPLIT_REGEX,
                           GetTestFilePath("input/patterns/invalidLine"))
 
 

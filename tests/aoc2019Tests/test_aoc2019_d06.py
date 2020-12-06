@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from aoc2019.d06 import parentChildRegex, OrbitCounter
+from aoc2019.d06 import PARENT_CHILD_REGEX, OrbitCounter
 
 
 class Test_Splitter(TestCase):
     def test_example(self):
-        m = parentChildRegex.match("COM)B")
+        m = PARENT_CHILD_REGEX.match("COM)B")
         self.assertIsNotNone(m)
         self.assertEqual(m.group(1), "COM")
         self.assertEqual(m.group(2), "B")

@@ -1,9 +1,9 @@
 import re
 
-from tools.fileLoader import load_patterns
+from tools.file_loader import load_patterns
 from tools.tree import KeyedTree
 
-parentChildRegex = re.compile("^([A-Z0-9]+)\\)([A-Z0-9]+)")
+PARENT_CHILD_REGEX = re.compile("^([A-Z0-9]+)\\)([A-Z0-9]+)")
 
 
 class OrbitCounter:
@@ -24,13 +24,13 @@ class OrbitCounter:
 
         return count
 
-    def get_hops(self, me, santa):
-        return len(self.tree.get_path(me, santa)) - 1
+    def get_hops(self, start_point, santa):
+        return len(self.tree.get_path(start_point, santa)) - 1
 
 
 if __name__ == "__main__":
     def main():
-        pairs = load_patterns(parentChildRegex, "input/d06.txt")
+        pairs = load_patterns(PARENT_CHILD_REGEX, "input/d06.txt")
         counter = OrbitCounter()
         for pair in pairs:
             counter.add(pair[0], pair[1])
