@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from aoc2020.d02 import splitRegex
 from tests.toolsTests.tools_common import GetTestFilePath
-from tools.fileLoader import load_ints, load_int_list, load_lists, load_patterns, load_dicts
+from tools.fileLoader import load_ints, load_int_list, load_lists, load_patterns, load_dicts, load_string_groups
 
 
 class TestLoadInts(TestCase):
@@ -116,3 +116,38 @@ class TestLoadDicts(TestCase):
         self.assertListEqual(
             dicts, load_dicts(
                 GetTestFilePath("input/dicts/exampleDict")))
+
+
+class TestLoadStringGroups(TestCase):
+    def test_load_sample(self):
+        expected = [
+            ["abc"],
+            ["a", "b", "c"],
+            ["ab", "ac"],
+            ["a", "a", "a", "a"],
+            ["b"]
+        ]
+        groups = load_string_groups(GetTestFilePath("input/stringGroups/sample.txt"))
+        self.assertListEqual(expected, groups)
+
+    def test_ignore_extra_breaks(self):
+        expected = [
+            ["abc"],
+            ["a", "b", "c"],
+            ["ab", "ac"],
+            ["a", "a", "a", "a"],
+            ["b"]
+        ]
+        groups = load_string_groups(GetTestFilePath("input/stringGroups/extraLineBreaks.txt"))
+        self.assertListEqual(expected, groups)
+
+    def test_ignore_extra_whitespace(self):
+        expected = [
+            ["abc"],
+            ["a", "b", "c"],
+            ["a  b", "ac"],
+            [" a", "a", "a", "a"],
+            ["b"]
+        ]
+        groups = load_string_groups(GetTestFilePath("input/stringGroups/whitespace.txt"))
+        self.assertListEqual(expected, groups)

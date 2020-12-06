@@ -15,6 +15,25 @@ def make_eq(key):
         return lambda lhs, rhs: lhs == rhs
 
 
+def count_items_across_groups(groups):
+    """
+    Given a list of iterables, returns the number of times each
+    unique item appears across all of the lists.
+
+    :param groups: A group of lists, each of which should be iterated over
+
+    :return: A dict mapping from item to the count of occurrences
+    """
+    result = {}
+    for group in groups:
+        for item in group:
+            if item not in result:
+                result[item] = 1
+            else:
+                result[item] += 1
+    return result
+
+
 def unsorted_matched_groups(a, b, key=None):
     """
     Return all sets of matching elements. Note that is different to
