@@ -1,6 +1,7 @@
 import copy
 from unittest import TestCase
 
+from tools.listOps import count_items_across_groups
 from tools.listOps import non_sorted_intersection, unsorted_matched_groups, find_sum_pair, ListTooShort, find_sum_trio
 from tools.paths import Point, PathPoint
 
@@ -154,6 +155,33 @@ class TestFindSumPair(TestCase):
     def test_PuzzleInput(self):
         numbers = [1721, 979, 366, 299, 675, 1456]
         self.assertListEqual(find_sum_pair(numbers, 2020), [299, 1721])
+
+
+class TestCountItems(TestCase):
+    def test_empty_list(self):
+        expected = {}
+        group = []
+        self.assertDictEqual(expected, count_items_across_groups(group))
+
+    def test_empty_lists(self):
+        expected = {}
+        group = [[], [], []]
+        self.assertDictEqual(expected, count_items_across_groups(group))
+
+    def test_empty_strings(self):
+        expected = {}
+        group = ["", "", ""]
+        self.assertDictEqual(expected, count_items_across_groups(group))
+
+    def test_strings(self):
+        expected = {
+            "a": 8,
+            "b": 2,
+            "c": 2,
+            " ": 1
+        }
+        group = ["abc", "aaa aaa", "abc"]
+        self.assertDictEqual(expected, count_items_across_groups(group))
 
 
 class TestFindSumTrio(TestCase):

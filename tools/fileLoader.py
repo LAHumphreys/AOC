@@ -33,6 +33,24 @@ def load_lists(file):
     return result
 
 
+def load_string_groups(file):
+    result = []
+    with open(file) as f:
+        thisGroup = []
+        for lin in f.readlines():
+            if lin[-1] == "\n":
+                lin = lin[0:-1]
+            if len(lin) == 0:
+                if len(thisGroup) > 0:
+                    result.append(thisGroup)
+                    thisGroup = []
+            else:
+                thisGroup.append(lin)
+        if len(thisGroup) > 0:
+            result.append(thisGroup)
+    return result
+
+
 def load_patterns(parser_regex, file):
     result = []
     with open(file) as f:
