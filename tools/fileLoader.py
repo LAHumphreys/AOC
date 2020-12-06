@@ -1,3 +1,5 @@
+import re
+
 from tools.dictTools import build_dicts
 
 
@@ -51,7 +53,15 @@ def load_string_groups(file):
     return result
 
 
-def load_patterns(parser_regex, file):
+class UnexpectedLineFormat(Exception):
+    pass
+
+
+class UnexpectedNumberOfRows(Exception):
+    pass
+
+
+def load_patterns(parser_regex, file, numResults=None):
     result = []
     with open(file) as f:
         for lin in f.readlines():
@@ -59,8 +69,28 @@ def load_patterns(parser_regex, file):
             if m is not None:
                 result.append(m.groups())
             else:
-                raise ValueError
+                raise UnexpectedLineFormat
+    if numResults is not None:
+        if numResults != len(result):
+            raise UnexpectedNumberOfRows
 
+    return result
+
+
+anyRegex = re.compile(".*")
+
+
+def load_one(file, validator=anyRegex):
+    result = None
+    with open(file) as f:
+        lines = f.readlines()
+        if len(lines) != 1:
+            raise UnexpectedNumberOfRows
+        result = lines[0]
+        if result[-1] == "\n":
+            result = result[:-1]
+        if not validator.match(result):
+            raise UnexpectedLineFormat
     return result
 
 

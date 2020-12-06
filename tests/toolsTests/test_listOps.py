@@ -1,7 +1,7 @@
 import copy
 from unittest import TestCase
 
-from tools.listOps import count_items_across_groups
+from tools.listOps import count_items_across_groups, split_to_dims, BadDimensions
 from tools.listOps import non_sorted_intersection, unsorted_matched_groups, find_sum_pair, ListTooShort, find_sum_trio
 from tools.paths import Point, PathPoint
 
@@ -212,3 +212,82 @@ class TestFindSumTrio(TestCase):
     def test_PuzzleInput(self):
         numbers = [1721, 979, 366, 299, 675, 1456]
         self.assertListEqual(find_sum_trio(numbers, 2020), [366, 675, 979])
+
+
+class SplitToDims(TestCase):
+    def test_2_by_2(self):
+        code = "0123"
+        expected = [
+            ["0", "1"],
+            ["2", "3"]
+        ]
+        self.assertListEqual(expected, split_to_dims(code, (2, 2)))
+
+    def test_2_by_any(self):
+        code = "012345"
+        expected = [
+            ["0", "1"],
+            ["2", "3"],
+            ["4", "5"],
+        ]
+        self.assertListEqual(expected, split_to_dims(code, (2, None)))
+
+    def test_2_by_2_by_2(self):
+        code = "01234567"
+        expected = [
+            [["0", "1"], ["2", "3"]],
+            [["4", "5"], ["6", "7"]]
+        ]
+        self.assertListEqual(expected, split_to_dims(code, (2, 2, 2)))
+
+    def test_1_by_2_by_4(self):
+        code = "01234567"
+        expected = [
+            [["0"], ["1"]],
+            [["2"], ["3"]],
+            [["4"], ["5"]],
+            [["6"], ["7"]],
+        ]
+        self.assertListEqual(expected, split_to_dims(code, (1, 2, 4)))
+
+    def test_1_by_2_by_any(self):
+        code = "01234567"
+        expected = [
+            [["0"], ["1"]],
+            [["2"], ["3"]],
+            [["4"], ["5"]],
+            [["6"], ["7"]],
+        ]
+        self.assertListEqual(expected, split_to_dims(code, (1, 2, None)))
+
+    def test_2_by_2_by_2_empty(self):
+        code = ""
+
+        def do_split():
+            split_to_dims(code, (2, 2, 2))
+
+        self.assertRaises(BadDimensions, do_split)
+
+    def test_2_by_2_by_2_missing(self):
+        code = "0123456"
+
+        def do_split():
+            split_to_dims(code, (2, 2, 2))
+
+        self.assertRaises(BadDimensions, do_split)
+
+    def test_2_by_2_by_2_extra(self):
+        code = "012345678"
+
+        def do_split():
+            split_to_dims(code, (2, 2, 2))
+
+        self.assertRaises(BadDimensions, do_split)
+
+    def test_2_by_2_by_2_extra_dim(self):
+        code = "0123456789012345"
+
+        def do_split():
+            split_to_dims(code, (2, 2, 2))
+
+        self.assertRaises(BadDimensions, do_split)
