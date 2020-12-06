@@ -1,4 +1,4 @@
-from tools.fileLoader import load_ints
+from tools.file_loader import load_ints
 
 
 def calc_fuel(mass):
@@ -17,16 +17,16 @@ def calc_rocket_fuel(mass):
 
 def calc_total_fuel(masses):
     fuel = 0
-    for m in masses:
-        fuel += calc_fuel(m)
+    for mass in masses:
+        fuel += calc_fuel(mass)
 
     return fuel
 
 
 def total_rocket_fuel(masses):
     fuel = 0
-    for m in masses:
-        fuel += calc_rocket_fuel(m)
+    for mass in masses:
+        fuel += calc_rocket_fuel(mass)
 
     return fuel
 

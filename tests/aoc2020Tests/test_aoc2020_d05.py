@@ -1,23 +1,23 @@
 from unittest import TestCase
 
-from aoc2020.d05 import chop, get_all_seats, getSeat
+from aoc2020.d05 import chop, get_all_seats, get_seat
 
 
 class Test_Part1(TestCase):
     def test_example1(self):
-        (row, col, seat_id) = getSeat("BFFFBBFRRR")
+        (row, col, seat_id) = get_seat("BFFFBBFRRR")
         self.assertEqual(row, 70)
         self.assertEqual(col, 7)
         self.assertEqual(seat_id, 567)
 
     def test_example2(self):
-        (row, col, seat_id) = getSeat("FFFBBBFRRR")
+        (row, col, seat_id) = get_seat("FFFBBBFRRR")
         self.assertEqual(row, 14)
         self.assertEqual(col, 7)
         self.assertEqual(seat_id, 119)
 
     def test_example3(self):
-        (row, col, seat_id) = getSeat("BBFFBBFRLL")
+        (row, col, seat_id) = get_seat("BBFFBBFRLL")
         self.assertEqual(row, 102)
         self.assertEqual(col, 4)
         self.assertEqual(seat_id, 820)

@@ -1,18 +1,33 @@
+"""
+Utilities and algorithms for manipulating list like structures
+"""
 import copy
 
 
 def make_lt(key):
+    """
+    Internal tools less-than comparator factory function
+    """
     if key is not None:
-        return lambda lhs, rhs: key(lhs) < key(rhs)
+        def less_than(lhs, rhs):
+            return key(lhs) < key(rhs)
     else:
-        return lambda lhs, rhs: lhs < rhs
+        def less_than(lhs, rhs):
+            return lhs < rhs
+    return less_than
 
 
 def make_eq(key):
+    """
+    Internal tools equals comparator factory function
+    """
     if key is not None:
-        return lambda lhs, rhs: key(lhs) == key(rhs)
+        def equals(lhs, rhs):
+            return key(lhs) == key(rhs)
     else:
-        return lambda lhs, rhs: lhs == rhs
+        def equals(lhs, rhs):
+            return lhs == rhs
+    return equals
 
 
 def count_items_across_groups(groups):
@@ -34,7 +49,7 @@ def count_items_across_groups(groups):
     return result
 
 
-def unsorted_matched_groups(a, b, key=None):
+def unsorted_matched_groups(list_a, list_b, key=None):
     """
     Return all sets of matching elements. Note that is different to
     NonSortedIntersection which returns a unique list of matching
@@ -43,8 +58,8 @@ def unsorted_matched_groups(a, b, key=None):
     STOP: If you simply want a list of matches, you may want
           NonSortedIntersection
 
-    :param a:   A list to be compared to list B
-    :param b:   A list to be compared to list A
+    :param list_a:   A list to be compared to list B
+    :param list_b:   A list to be compared to list A
 
     :param key: Optional transform of an item, used to sort and check equality
 
@@ -54,8 +69,8 @@ def unsorted_matched_groups(a, b, key=None):
                  1: A list of items from B which matched the item in [0]
              e.g [([1], [1,1]), ([2,2], [2,2])]
     """
-    list_a = copy.copy(a)
-    list_b = copy.copy(b)
+    list_a = copy.copy(list_a)
+    list_b = copy.copy(list_b)
     list_a.sort(key=key)
     list_b.sort(key=key)
 
@@ -63,48 +78,48 @@ def unsorted_matched_groups(a, b, key=None):
     len_a = len(list_a)
     len_b = len(list_b)
 
-    lt = make_lt(key)
-    eq = make_eq(key)
+    less_than = make_lt(key)
+    equals = make_eq(key)
 
-    ia = ib = 0
-    while ia < len_a and ib < len_b:
-        a = list_a[ia]
-        b = list_b[ib]
+    index_a = index_b = 0
+    while index_a < len_a and index_b < len_b:
+        item_a = list_a[index_a]
+        item_b = list_b[index_b]
 
         do_matches = False
 
-        if eq(a, b):
+        if equals(item_a, item_b):
             do_matches = True
-        elif lt(a, b):
-            ia += 1
+        elif less_than(item_a, item_b):
+            index_a += 1
         else:
-            ib += 1
+            index_b += 1
 
         if do_matches:
             matches_a = []
             matches_b = []
-            while ia < len_a and eq(list_a[ia], a):
-                matches_a.append(list_a[ia])
-                ia += 1
+            while index_a < len_a and equals(list_a[index_a], item_a):
+                matches_a.append(list_a[index_a])
+                index_a += 1
 
-            while ib < len_b and eq(list_b[ib], b):
-                matches_b.append(list_b[ib])
-                ib += 1
+            while index_b < len_b and equals(list_b[index_b], item_b):
+                matches_b.append(list_b[index_b])
+                index_b += 1
 
             matches.append((matches_a, matches_b))
 
     return matches
 
 
-def non_sorted_intersection(a: list, b: list, key=None):
+def non_sorted_intersection(list_a: list, list_b: list, key=None):
     """
     Look for items that appear in both lists A and B.
 
     This variant returns a single list of unique matches. If there are duplicate
     matches, no guarantee is made as to which of the duplicates are returned.
 
-    :param a:   A list to be compared to list B
-    :param b:   A list to be compared to list A
+    :param list_a:   A list to be compared to list B
+    :param list_b:   A list to be compared to list A
 
     :param key: Optional transform of an item, used to sort and check equality
 
@@ -113,35 +128,35 @@ def non_sorted_intersection(a: list, b: list, key=None):
              removed.
     """
 
-    list_a = copy.copy(a)
-    list_b = copy.copy(b)
+    list_a = copy.copy(list_a)
+    list_b = copy.copy(list_b)
     list_a.sort(key=key)
     list_b.sort(key=key)
-    ia = 0
-    ib = 0
+    index_a = 0
+    index_b = 0
     matches = []
     len_a = len(list_a)
     len_b = len(list_b)
 
-    lt = make_lt(key)
-    eq = make_eq(key)
+    less_than = make_lt(key)
+    equals = make_eq(key)
 
-    while ia < len_a and ib < len_b:
-        a = list_a[ia]
-        b = list_b[ib]
-        while ia < (len_a - 1) and eq(list_a[ia + 1], a):
-            ia += 1
-        while ib < (len_b - 1) and eq(list_b[ib + 1], b):
-            ib += 1
+    while index_a < len_a and index_b < len_b:
+        item_a = list_a[index_a]
+        item_b = list_b[index_b]
+        while index_a < (len_a - 1) and equals(list_a[index_a + 1], item_a):
+            index_a += 1
+        while index_b < (len_b - 1) and equals(list_b[index_b + 1], item_b):
+            index_b += 1
 
-        if eq(a, b):
-            matches.append(a)
-            ia += 1
-            ib += 1
-        elif lt(a, b):
-            ia += 1
+        if equals(item_a, item_b):
+            matches.append(item_a)
+            index_a += 1
+            index_b += 1
+        elif less_than(item_a, item_b):
+            index_a += 1
         else:
-            ib += 1
+            index_b += 1
 
     return matches
 
@@ -150,7 +165,6 @@ class BadDimensions(Exception):
     """
     Thrown if the specified number dimensions does not match the data provided
     """
-    pass
 
 
 def split_to_dims(iterable, dimensions: tuple):
@@ -168,7 +182,7 @@ def split_to_dims(iterable, dimensions: tuple):
             => [["1", "2"], ["3", "4"], ["5", "6"]]
 
     :param iterable: The item generator
-    :param dimensions: A tuple of integer dimensions. The first item in the tupple
+    :param dimensions: A tuple of integer dimensions. The first item in the tuple
                        is the inner most dimension.
                        The final item may be None, to indicate "any" length
 
@@ -176,13 +190,13 @@ def split_to_dims(iterable, dimensions: tuple):
     """
     stacking = False
     result = None
-    if dimensions[-1] == None:
+    if dimensions[-1] is None:
         stacking = True
         dimensions = dimensions[:-1]
         result = []
 
     number_of_dimensions = len(dimensions)
-    stack = [[] for x in dimensions]
+    stack = [[] for _ in range(number_of_dimensions)]
     for item in iterable:
         stack[0].append(item)
         i = 0
@@ -201,16 +215,18 @@ def split_to_dims(iterable, dimensions: tuple):
 
     if result is None:
         raise BadDimensions
-    else:
-        for dim in stack:
-            if len(dim) != 0:
-                raise BadDimensions
+
+    for dim in stack:
+        if len(dim) != 0:
+            raise BadDimensions
 
     return result
 
 
 class ListTooShort(Exception):
-    pass
+    """
+    Raised if insufficient items have been provided to perform the requested operation
+    """
 
 
 def find_sum_pair_presorted(numbers: list, target: int):
@@ -254,10 +270,11 @@ def find_sum_pair_presorted(numbers: list, target: int):
         else:
             base_low += 1
 
+    result = None
     if found:
-        return [numbers[base_low], numbers[high]]
-    else:
-        return None
+        result = [numbers[base_low], numbers[high]]
+
+    return result
 
 
 def find_sum_pair(numbers: list, target: int):

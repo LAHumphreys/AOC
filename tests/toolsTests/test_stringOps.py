@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from tools.stringsOps import count_chars
+from tools.string_operations import count_chars
 
 
 class TestLoadCharCount(TestCase):

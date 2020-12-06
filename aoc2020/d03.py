@@ -7,20 +7,20 @@ class Map:
     def get_height(self):
         return self.height
 
-    def get_coord(self, x, y):
-        x = x % self.width
-        return self.map_data[y][x]
+    def get_coord(self, x_coordinate, y_coordinate):
+        x_coordinate = x_coordinate % self.width
+        return self.map_data[y_coordinate][x_coordinate]
 
 
-def count_trees(inp, dx, dy):
+def count_trees(inp, delta_x, delta_y):
     map_obj = Map(inp)
-    y = 0
-    x = 0
+    x_coord = 0
+    y_coord = 0
     trees = 0
-    while y < (map_obj.get_height() - dy):
-        x += dx
-        y += dy
-        coord = map_obj.get_coord(x, y)
+    while x_coord < (map_obj.get_height() - delta_y):
+        y_coord += delta_x
+        x_coord += delta_y
+        coord = map_obj.get_coord(y_coord, x_coord)
         if coord == ".":
             pass
         elif coord == "#":
@@ -34,8 +34,8 @@ def count_trees(inp, dx, dy):
 if __name__ == "__main__":
     def main():
         coords = []
-        f = open("input/d03.txt")
-        for lin in f.readlines():
+        file_handle = open("input/d03.txt")
+        for lin in file_handle.readlines():
             if lin[-1] == "\n":
                 lin = lin[0:-1]
             coords.append(lin)
@@ -48,8 +48,8 @@ if __name__ == "__main__":
         ]
         total = 1
         for slop in slopes:
-            [x, y] = slop
-            trees = count_trees(coords, x, y)
+            [x_point, y_point] = slop
+            trees = count_trees(coords, x_point, y_point)
             total *= trees
-            print("Trees ({0}, {1}): {2} ({3})".format(x, y, trees, total))
+            print("Trees ({0}, {1}): {2} ({3})".format(x_point, y_point, trees, total))
         main()

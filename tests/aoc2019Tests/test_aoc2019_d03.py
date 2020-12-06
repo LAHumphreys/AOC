@@ -64,9 +64,7 @@ class TestShortestDistance(TestCase):
     def test_example1(self):
         vectorsA = ["R8", "U5", "L5", "D3"]
         vectorsB = ["U7", "R6", "D4", "L4"]
-        self.assertEqual(
-            30, find_shortest_intersection(
-                vectorsA, vectorsB).pathLen)
+        self.assertEqual(30, find_shortest_intersection(vectorsA, vectorsB))
 
     def test_example2(self):
         vectorsA = [
@@ -81,8 +79,7 @@ class TestShortestDistance(TestCase):
             "L72"]
         vectorsB = ["U62", "R66", "U55", "R34", "D71", "R55", "D58", "R83"]
         self.assertEqual(
-            610, find_shortest_intersection(
-                vectorsA, vectorsB).pathLen)
+            610, find_shortest_intersection(vectorsA, vectorsB))
 
     def test_example3(self):
         vectorsA = [
@@ -109,5 +106,4 @@ class TestShortestDistance(TestCase):
             "U6",
             "R7"]
         self.assertEqual(
-            410, find_shortest_intersection(
-                vectorsA, vectorsB).pathLen)
+            410, find_shortest_intersection(vectorsA, vectorsB))
