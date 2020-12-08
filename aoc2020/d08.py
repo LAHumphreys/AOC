@@ -27,33 +27,37 @@ def flip_op(op_code):
 
 def repair(computer):
     i = 0
+    original_code = copy.deepcopy(computer.original_code)
     while computer.instruction_pointer < len(computer.code) and i < len(computer.code):
-        computer.reset()
-        computer.code[i].operation = flip_op(computer.code[i].operation)
+        code = copy.deepcopy(original_code)
+        code[i].operation = flip_op(code[i].get_operation())
+        computer.reset(code)
         computer.execute_until_repeated()
         i += 1
 
 
 class Computer:
     def __init__(self, code):
-        self.original_code = copy.deepcopy(code)
+        self.original_code = None
+        self.code = None
         self.accumulator = None
         self.instruction_pointer = None
-        self.code = None
-        self.executed = None
-        self.reset()
+        self.reset(code)
 
-    def reset(self):
+    def reset(self, code=None):
         self.accumulator = 0
         self.instruction_pointer = 0
-        self.code = copy.deepcopy(self.original_code)
-        self.executed = []
+        if code is not None:
+            self.original_code = copy.deepcopy(code)
+            self.code = copy.deepcopy(code)
+        else:
+            self.code = copy.deepcopy(self.original_code)
 
     def get_this_operation(self):
         return self.code[self.instruction_pointer].operation
 
     def get_argument(self):
-        return self.code[self.instruction_pointer].offset
+        return self.code[self.instruction_pointer].get_argument(0, self.code)
 
     def execute_one(self):
         op = self.get_this_operation()
@@ -70,43 +74,53 @@ class Computer:
             self.execute_one()
 
     def execute_until_repeated(self):
-        while (self.instruction_pointer not in self.executed and self.instruction_pointer < len(self.code)):
-            self.executed.append(self.instruction_pointer)
+        executed = []
+        while (self.instruction_pointer not in executed and \
+               self.instruction_pointer < len(self.code)):
+            executed.append(self.instruction_pointer)
             self.execute_one()
+
+
+def parse_offset(sign, offset):
+    if sign == "+":
+        return int(offset)
+    elif sign == "-":
+        return -1 * int(offset)
+    else:
+        raise UnknownCode
+
+
+def parse_operation(op):
+    if op == "nop":
+        return OperationCode.NO_OP
+    elif op == "acc":
+        return OperationCode.ACCUMULATE
+    elif op == "jmp":
+        return OperationCode.JUMP
+    else:
+        raise UnknownCode
 
 
 class Instruction:
     def __init__(self, op, sign, offset):
-        self.operation = self.parse_operation(op)
-        self.offset = self.parse_offset(sign, offset)
+        self.operation = parse_operation(op)
+        self.argument_0 = parse_offset(sign, offset)
+
+    def get_operation(self):
+        return self.operation
+
+    def get_argument(self, index, code):
+        return self.argument_0
 
     def __eq__(self, other):
         return self.operation == other.operation and \
-               self.offset == other.offset
+               self.argument_0 == other.argument_0
 
     def __str__(self):
-        return "<Instruction: {0} {1}>".format(self.operation, self.offset)
+        return "<Instruction: {0} {1}>".format(self.operation, self.argument_0)
 
     def __repr__(self):
         return self.__str__()
-
-    def parse_offset(self, sign, offset):
-        if sign == "+":
-            return int(offset)
-        elif sign == "-":
-            return -1 * int(offset)
-        else:
-            raise UnknownCode
-
-    def parse_operation(self, op):
-        if op == "nop":
-            return OperationCode.NO_OP
-        elif op == "acc":
-            return OperationCode.ACCUMULATE
-        elif op == "jmp":
-            return OperationCode.JUMP
-        else:
-            raise UnknownCode
 
 
 def load_code(path):
@@ -115,14 +129,6 @@ def load_code(path):
     code = [Instruction(inst[0], inst[1], inst[2]) for inst in raw_code]
     computer = Computer(code)
     return computer
-
-
-def part_1(path):
-    return load_one(path)
-
-
-def part_2(path):
-    return load_one(path)
 
 
 if __name__ == "__main__":

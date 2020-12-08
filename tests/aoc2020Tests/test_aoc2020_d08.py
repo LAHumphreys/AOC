@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from aoc2020.d08 import part_2, load_code, OperationCode, flip_op, repair
+from aoc2020.d08 import load_code, OperationCode, flip_op, repair
 from tests.aoc2020Tests.aoc2020_common import GetTestFilePath
 
 
 class Test_Part1(TestCase):
-    def test_load_code(self):
+    def test_execute_example1(self):
         path = GetTestFilePath("samples/d08/sample1.txt")
         computer = load_code(path)
         self.assertEqual(computer.instruction_pointer, 0)
@@ -26,10 +26,7 @@ class Test_Part1(TestCase):
         path = GetTestFilePath("samples/d08/sample1.txt")
         computer = load_code(path)
         repair(computer)
+        computer.reset()
+        computer.execute()
         self.assertEqual(computer.accumulator, 8)
 
-class Test_Part2(TestCase):
-    def test_Example2(self):
-        path = GetTestFilePath("samples/d08/sample2.txt")
-        expected = "world"
-        self.assertEqual(expected, part_2(path))
