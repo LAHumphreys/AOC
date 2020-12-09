@@ -2,6 +2,7 @@ import copy
 from unittest import TestCase
 
 from tools.list_ops import count_items_across_groups, split_to_dims, BadDimensions
+from tools.list_ops import find_sum_range
 from tools.list_ops import non_sorted_intersection, unsorted_matched_groups, find_sum_pair, ListTooShort, find_sum_trio
 from tools.paths import Point, PathPoint
 
@@ -124,6 +125,25 @@ class TestIntersectGroups(TestCase):
             unsorted_matched_groups(
                 listA, listB, key=key), matches)
 
+
+class TestFindSumRange(TestCase):
+    def test_NoSuchRange(self):
+        self.assertIsNone(find_sum_range([1, 2, 3, 4], 99))
+
+    def test_start(self):
+        self.assertEqual((0, 2), find_sum_range([1, 2, 3, 4, 5], 6))
+
+    def test_end(self):
+        self.assertEqual((2, 4), find_sum_range([1, 2, 3, 4, 5], 12))
+
+    def test_centre(self):
+        self.assertEqual((2, 4), find_sum_range([1, 2, 3, 99, 4, 5], 106))
+
+    def test_single_item(self):
+        self.assertEqual((3, 3), find_sum_range([1, 2, 3, 99, 4, 5], 99))
+
+    def test_full_list(self):
+        self.assertEqual((0, 5), find_sum_range([1, 2, 3, 99, 4, 5], 114))
 
 class TestFindSumPair(TestCase):
     def test_EmptyList(self):
