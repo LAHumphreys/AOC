@@ -133,6 +133,9 @@ class TestFindSumRange(TestCase):
     def test_start(self):
         self.assertEqual((0, 2), find_sum_range([1, 2, 3, 4, 5], 6))
 
+    def test_start_zero(self):
+        self.assertEqual((0, 2), find_sum_range([1, 2, -3, 3, 4, 5], 0))
+
     def test_end(self):
         self.assertEqual((2, 4), find_sum_range([1, 2, 3, 4, 5], 12))
 
@@ -160,7 +163,7 @@ class TestFindSumRange(TestCase):
                 return NonPrimitive(self.value + other.value)
 
         values = [NonPrimitive(v) for v in (1, 2, 3, 99, 4, 5)]
-        self.assertEqual((2, 3), find_sum_range(values, NonPrimitive(102), zero_value=NonPrimitive(0)))
+        self.assertEqual((2, 3), find_sum_range(values, NonPrimitive(102)))
 
 class TestFindSumPair(TestCase):
     def test_EmptyList(self):
