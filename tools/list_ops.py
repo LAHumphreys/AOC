@@ -223,6 +223,37 @@ def split_to_dims(iterable, dimensions: tuple):
     return result
 
 
+def find_sum_range(values: list, target):
+    """
+    Search the provided list of values for a contiguous range
+    of values that sum to the provided target. If not primitives,
+    the list objects must implement the following methods:
+          __add__,
+          __eq__
+    :param values:       A list of values to search
+    :param target:       The value the range must sum to
+    :return:             [start index, end index) of the range, or None
+                         if there is no such range
+    """
+    num_values = len(values)
+
+    start_index = 0
+    result = None
+    while result is None and start_index < num_values:
+        range_sum = 0
+        end_index = start_index - 1
+        while end_index < (num_values - 1) and range_sum < target:
+            end_index += 1
+            range_sum += values[end_index]
+
+        if range_sum == target:
+            result = (start_index, end_index)
+        else:
+            start_index += 1
+
+    return result
+
+
 class ListTooShort(Exception):
     """
     Raised if insufficient items have been provided to perform the requested operation
