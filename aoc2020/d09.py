@@ -1,10 +1,11 @@
 import copy
-from tools.file_loader import load_one, load_ints
+
+from tools.file_loader import load_ints
 from tools.list_ops import find_sum_pair
 
 
-def is_valid(slice, to_check):
-    check_digits = copy.copy(slice)
+def is_valid(check_slice, to_check):
+    check_digits = copy.copy(check_slice)
     check_digits.sort()
     return find_sum_pair(check_digits, to_check)
 
@@ -13,9 +14,9 @@ def part_one(values, num_check_digits):
     i = num_check_digits
     invalid = None
     while i < len(values) and invalid is None:
-        slice = values[i-num_check_digits:i]
+        check_slice = values[i - num_check_digits:i]
         to_check = values[i]
-        if is_valid(slice, to_check) is None:
+        if is_valid(check_slice, to_check) is None:
             invalid = to_check
         i += 1
     return invalid
@@ -43,5 +44,5 @@ if __name__ == "__main__":
         values = load_ints("input/d09.txt")
         invalid_number = part_one(values, 25)
         print(invalid_number)
-        print(part_two(values, invalid_number ))
+        print(part_two(values, invalid_number))
     main()
