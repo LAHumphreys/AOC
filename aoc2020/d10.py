@@ -1,4 +1,4 @@
-from tools.file_loader import load_one, load_ints
+from tools.file_loader import load_ints
 
 
 class BadDiff(Exception):
