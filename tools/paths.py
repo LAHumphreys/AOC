@@ -1,7 +1,60 @@
 """
 Tools for manipulating spatial paths
 """
+from enum import Enum
 from math import fabs
+
+
+class CardinalPoint(Enum):
+    """
+    A point on the compass
+    """
+    North = 0
+    East = 90
+    South = 180
+    West = 270
+
+
+class TurnDirection(Enum):
+    """
+    A clockwise (right) or counterclockwise (left) rotation
+    """
+    Left = 0
+    Right = 1
+
+
+def flip_direction(direction: TurnDirection):
+    """
+    Utility method to flip the direction of a rotation
+    """
+    if direction == TurnDirection.Left:
+        result = TurnDirection.Right
+    elif direction == TurnDirection.Right:
+        result = TurnDirection.Left
+    else:
+        raise ValueError
+    return result
+
+
+def turn(cardinal: CardinalPoint, direction: TurnDirection, degrees: int):
+    """
+    Given a body is currently pointed in the direction specified by
+    cardinal - return the direction it will be pointed to after a
+    a rotation of <degrees> in <direction>.
+
+    The rotation must alight on a valid CardinalPoint, else a
+    ValueError will be thrown
+
+    :return: The Cardinal point the body is now pointed
+    """
+    if direction == TurnDirection.Left:
+        result = cardinal.value - degrees
+    elif direction == TurnDirection.Right:
+        result = cardinal.value + degrees
+    else:
+        raise ValueError
+
+    return CardinalPoint(result % 360)
 
 
 class Point:
@@ -68,22 +121,32 @@ class PathPoint:
         return self.__str__()
 
 
-def make_path_from_vectors(vectors: list):
+def make_path_from_vectors(vectors: list, direction: CardinalPoint = None):
     """
     Wraps max_path to allow a whole sequence of path steps,
-    e.g:
+    e.g explicit directions:
        ["U2", "L3", "D1", "U2"]
+    if the optional <direction> argument has been provided, then additional
+    commands are accepted:
+       C: Turn counter clock-wise
+       A: Turn counter counter-clock-wise
+       F: Go forward in the direction of the cardinal point (Up = North)
     """
     origin = PathPoint(0, 0, 0)
     path = [origin]
     for vec in vectors:
-        line = make_path(path[-1], vec)
-        path += line[1:]
+        if vec[0] == "C":
+            direction = turn(direction, TurnDirection.Right, int(vec[1:]))
+        elif vec[0] == "A":
+            direction = turn(direction, TurnDirection.Left, int(vec[1:]))
+        else:
+            line = make_path(path[-1], vec, direction)
+            path += line[1:]
 
     return path
 
 
-def make_path(origin: PathPoint, code: str):
+def make_path(origin: PathPoint, code: str, direction: CardinalPoint = None):
     """
     Create a path from origin to a point defined relative to origin
     by a string instruction of the form:
@@ -93,19 +156,22 @@ def make_path(origin: PathPoint, code: str):
         D3: Down (-'ve y axis) 3 points
         R4: Left (+'ve x axis) 4 points
         L3: Right (-'ve x axis) 3 points
+        F3: Go forward (U/D/L/R bases on the provided cardinal point)
     """
     path = [origin]
     if len(code) > 0:
         delta_x = 0
         delta_y = 0
         path_len = int(code[1:])
-        if code[0] == "R":
+        letter = code[0]
+        is_forward = (letter == "F")
+        if letter == "R" or (is_forward and direction == CardinalPoint.East):
             delta_x = 1
-        elif code[0] == "L":
+        elif letter == "L" or (is_forward and direction == CardinalPoint.West):
             delta_x = -1
-        elif code[0] == "U":
+        elif letter == "U" or (is_forward and direction == CardinalPoint.North):
             delta_y = 1
-        elif code[0] == "D":
+        elif letter == "D" or (is_forward and direction == CardinalPoint.South):
             delta_y = -1
 
         for i in range(1, path_len + 1):
@@ -115,6 +181,41 @@ def make_path(origin: PathPoint, code: str):
                     origin.point.y_coordinate + i * delta_y,
                     origin.path_len + i))
     return path
+
+
+def rotate(origin: Point, point: Point, direction: TurnDirection, degrees: int):
+    """
+    Rotate The point (point) by (degrees) degrees around the origin point (origin)
+
+    :param origin:    The point to rotate around
+    :param point:     The point to rotate
+    :param direction: Right (clockwise) or Left (counter-clockwise)
+    :param degrees:   90, 180 or 270
+
+    :return: The rotated Point
+    """
+    coordinate_x = point.x_coordinate - origin.x_coordinate
+    coordinate_y = point.y_coordinate - origin.y_coordinate
+
+    if degrees == 0:
+        pass
+    elif degrees == 180:
+        coordinate_x *= -1
+        coordinate_y *= -1
+    elif degrees in (90, 270):
+        if degrees == 270:
+            direction = flip_direction(direction)
+
+        if direction == TurnDirection.Right:
+            coordinate_x, coordinate_y = coordinate_y, -coordinate_x
+        elif direction == TurnDirection.Left:
+            coordinate_x, coordinate_y = -coordinate_y, coordinate_x
+        else:
+            raise ValueError
+    else:
+        raise ValueError
+
+    return Point(origin.x_coordinate + coordinate_x, origin.y_coordinate + coordinate_y)
 
 
 def sort_by_manhattan_distance(path: list):
