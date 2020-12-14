@@ -4,6 +4,7 @@ import re
 class Mask:
     def __init__(self):
         self.set_mask("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        self.address_masks = None
 
     def set_mask(self, code):
         self.zero_mask = 0
@@ -103,7 +104,4 @@ if __name__ == "__main__":
         print("Checksum: {0}".format(checksum_memory(memory)))
         memory_v2 = run_program_version_2(program)
         print("Checksum: {0}".format(checksum_memory(memory_v2)))
-        pass
-
-
     main()
