@@ -27,4 +27,5 @@ jobs:
         pylint tools
     - name: Analysing problems with pylint (no docs required)
       run: |
-        pylint --disable=C0116,C0115,C0114 aoc2019 aoc2020
+        pylint --disable=C0116,C0115,C0114,C0209 aoc2019 aoc2020
+        pylint --disable=C0116,C0115,C0114 aoc2021

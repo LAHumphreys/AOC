@@ -14,8 +14,8 @@ def match_group(groups):
     count = 0
     for group in groups:
         answers = count_items_across_groups(group)
-        for character in answers:
-            if answers[character] == len(group):
+        for character in answers.items():
+            if character[1] == len(group):
                 count += 1
     return count
 

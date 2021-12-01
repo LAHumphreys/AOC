@@ -15,7 +15,7 @@ def load_state(path):
         "L": SeatState.EMPTY,
     }
     result = []
-    with open(path) as file:
+    with open(path, encoding="ascii") as file:
         for line in file.read().split("\n"):
             result.append([seat_map[char] for char in line])
     return result

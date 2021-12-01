@@ -11,7 +11,7 @@ def load_ints(file):
     Attempt to interpret each line of a text file as an integer
     """
     result = []
-    with open(file) as file_handle:
+    with open(file, encoding="ascii") as file_handle:
         for lin in file_handle.readlines():
             result.append(int(lin))
 
@@ -23,7 +23,7 @@ def load_int_list(file):
     Attempt to interpret each line of a text file as comma separated list of integers
     """
     result = []
-    with open(file) as file_handle:
+    with open(file, encoding="ascii") as file_handle:
         for tok in file_handle.read().split(","):
             result.append(int(tok))
 
@@ -35,7 +35,7 @@ def load_lists(file):
     Attempt to interpret each line of a text file as comma separated list of strings
     """
     result = []
-    with open(file) as file_handle:
+    with open(file, encoding="ascii") as file_handle:
         for lin in file_handle.readlines():
             if lin[-1] == "\n":
                 lin = lin[0:-1]
@@ -54,7 +54,7 @@ def load_string_groups(file):
     list of lines (string) in that paragraph
     """
     result = []
-    with open(file) as file_handle:
+    with open(file, encoding="ascii") as file_handle:
         this_group = []
         for lin in file_handle.readlines():
             if lin[-1] == "\n":
@@ -89,7 +89,7 @@ def load_patterns(parser_regex, file, num_results=None):
     the list of matched groups from the provided regex
     """
     result = []
-    with open(file) as file_handle:
+    with open(file, encoding="ascii") as file_handle:
         for lin in file_handle.readlines():
             match = parser_regex.search(lin)
             if match is not None:
@@ -112,7 +112,7 @@ def load_one(file, validator=MATCH_ANY):
     of expected format
     """
     result = None
-    with open(file) as file_handle:
+    with open(file, encoding="ascii") as file_handle:
         lines = file_handle.readlines()
         if len(lines) != 1:
             raise UnexpectedNumberOfRows
@@ -136,7 +136,7 @@ def load_dicts(file):
        j1:w1 j2:w2
        ...
     """
-    with (open(file)) as file_handle:
+    with (open(file, encoding="ascii")) as file_handle:
         lines = file_handle.read()
         result = build_dicts(lines)
 

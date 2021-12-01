@@ -9,28 +9,28 @@ class CardinalPoint(Enum):
     """
     A point on the compass
     """
-    North = 0
-    East = 90
-    South = 180
-    West = 270
+    NORTH = 0
+    EAST = 90
+    SOUTH = 180
+    WEST = 270
 
 
 class TurnDirection(Enum):
     """
     A clockwise (right) or counterclockwise (left) rotation
     """
-    Left = 0
-    Right = 1
+    LEFT = 0
+    RIGHT = 1
 
 
 def flip_direction(direction: TurnDirection):
     """
     Utility method to flip the direction of a rotation
     """
-    if direction == TurnDirection.Left:
-        result = TurnDirection.Right
-    elif direction == TurnDirection.Right:
-        result = TurnDirection.Left
+    if direction == TurnDirection.LEFT:
+        result = TurnDirection.RIGHT
+    elif direction == TurnDirection.RIGHT:
+        result = TurnDirection.LEFT
     else:
         raise ValueError
     return result
@@ -47,9 +47,9 @@ def turn(cardinal: CardinalPoint, direction: TurnDirection, degrees: int):
 
     :return: The Cardinal point the body is now pointed
     """
-    if direction == TurnDirection.Left:
+    if direction == TurnDirection.LEFT:
         result = cardinal.value - degrees
-    elif direction == TurnDirection.Right:
+    elif direction == TurnDirection.RIGHT:
         result = cardinal.value + degrees
     else:
         raise ValueError
@@ -62,9 +62,9 @@ class Point:
     Represents a point in cartesian space
     """
 
-    def __init__(self, x, y):
-        self.x_coordinate = x
-        self.y_coordinate = y
+    def __init__(self, x_coord, y_coord):
+        self.x_coordinate = x_coord
+        self.y_coordinate = y_coord
 
     def manhattan_distance(self):
         """
@@ -94,8 +94,8 @@ class PathPoint:
     A point (in cartesian space) along a vector path
     """
 
-    def __init__(self, x, y, length):
-        self.point = Point(x, y)
+    def __init__(self, x_coord, y_coord, length):
+        self.point = Point(x_coord, y_coord)
         self.path_len = length
 
     def get_point(self):
@@ -130,15 +130,15 @@ def make_path_from_vectors(vectors: list, direction: CardinalPoint = None):
     commands are accepted:
        C: Turn counter clock-wise
        A: Turn counter counter-clock-wise
-       F: Go forward in the direction of the cardinal point (Up = North)
+       F: Go forward in the direction of the cardinal point (Up = NORTH)
     """
     origin = PathPoint(0, 0, 0)
     path = [origin]
     for vec in vectors:
         if vec[0] == "C":
-            direction = turn(direction, TurnDirection.Right, int(vec[1:]))
+            direction = turn(direction, TurnDirection.RIGHT, int(vec[1:]))
         elif vec[0] == "A":
-            direction = turn(direction, TurnDirection.Left, int(vec[1:]))
+            direction = turn(direction, TurnDirection.LEFT, int(vec[1:]))
         else:
             line = make_path(path[-1], vec, direction)
             path += line[1:]
@@ -154,8 +154,8 @@ def make_path(origin: PathPoint, code: str, direction: CardinalPoint = None):
     e.g
         U4: Up (+'ve y axis) 4 points
         D3: Down (-'ve y axis) 3 points
-        R4: Left (+'ve x axis) 4 points
-        L3: Right (-'ve x axis) 3 points
+        R4: LEFT (+'ve x axis) 4 points
+        L3: RIGHT (-'ve x axis) 3 points
         F3: Go forward (U/D/L/R bases on the provided cardinal point)
     """
     path = [origin]
@@ -165,13 +165,13 @@ def make_path(origin: PathPoint, code: str, direction: CardinalPoint = None):
         path_len = int(code[1:])
         letter = code[0]
         is_forward = (letter == "F")
-        if letter == "R" or (is_forward and direction == CardinalPoint.East):
+        if letter == "R" or (is_forward and direction == CardinalPoint.EAST):
             delta_x = 1
-        elif letter == "L" or (is_forward and direction == CardinalPoint.West):
+        elif letter == "L" or (is_forward and direction == CardinalPoint.WEST):
             delta_x = -1
-        elif letter == "U" or (is_forward and direction == CardinalPoint.North):
+        elif letter == "U" or (is_forward and direction == CardinalPoint.NORTH):
             delta_y = 1
-        elif letter == "D" or (is_forward and direction == CardinalPoint.South):
+        elif letter == "D" or (is_forward and direction == CardinalPoint.SOUTH):
             delta_y = -1
 
         for i in range(1, path_len + 1):
@@ -189,7 +189,7 @@ def rotate(origin: Point, point: Point, direction: TurnDirection, degrees: int):
 
     :param origin:    The point to rotate around
     :param point:     The point to rotate
-    :param direction: Right (clockwise) or Left (counter-clockwise)
+    :param direction: RIGHT (clockwise) or LEFT (counter-clockwise)
     :param degrees:   90, 180 or 270
 
     :return: The rotated Point
@@ -206,9 +206,9 @@ def rotate(origin: Point, point: Point, direction: TurnDirection, degrees: int):
         if degrees == 270:
             direction = flip_direction(direction)
 
-        if direction == TurnDirection.Right:
+        if direction == TurnDirection.RIGHT:
             coordinate_x, coordinate_y = coordinate_y, -coordinate_x
-        elif direction == TurnDirection.Left:
+        elif direction == TurnDirection.LEFT:
             coordinate_x, coordinate_y = -coordinate_y, coordinate_x
         else:
             raise ValueError

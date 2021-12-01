@@ -54,7 +54,7 @@ def load_pogram(path):
     program = []
     mask_pattern = re.compile("mask = ([X01]{36})")
     mem_pattern = re.compile("mem\\[([0-9]+)] = ([0-9]+)")
-    with open(path) as file:
+    with open(path, encoding="ascii") as file:
         for line in file.read().split("\n"):
             mask_match = mask_pattern.match(line)
             mem_match = mem_pattern.match(line)

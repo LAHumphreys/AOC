@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from aoc2021.d01 import count_increases, count_trios
 from tools.file_loader import load_ints
-from aoc2021_common import get_test_file_path
+from tests.aoc2021Tests.aoc2021_common import get_test_file_path
 
 
 class TestCount(TestCase):
