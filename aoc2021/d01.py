@@ -1,5 +1,5 @@
-from tools.file_loader import load_ints
 from typing import List
+from tools.file_loader import load_ints
 
 
 def count_increases(numbers: List[int]):

@@ -161,7 +161,7 @@ class KeyedNode:
         return self.key < other.key
 
     def __repr__(self):
-        return "<KeyedNode: {0}>".format(self.key)
+        return f"<KeyedNode: {self.key}>"
 
     def __str__(self):
         return self.__repr__()
@@ -202,8 +202,8 @@ class KeyedTree:
             def callback(node: KeyedNode):
                 pass
         """
-        for node in self.nodes:
-            callback(self.nodes[node])
+        for node in self.nodes.items():
+            callback(node[1])
 
     def add_pair(self, parent, child):
         """

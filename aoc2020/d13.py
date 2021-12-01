@@ -16,7 +16,7 @@ def calc_part_one(bus_ids, start_time):
 
 
 def load_notes(path):
-    with open(path) as file:
+    with open(path, encoding="ascii") as file:
         lines = file.readlines()
         if len(lines) != 2:
             raise ValueError
@@ -26,7 +26,7 @@ def load_notes(path):
 
 
 def load_notes_with_offset(path):
-    with open(path) as file:
+    with open(path, encoding="ascii") as file:
         lines = file.readlines()
         if len(lines) != 2:
             raise ValueError

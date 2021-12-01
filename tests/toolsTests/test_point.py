@@ -33,7 +33,7 @@ class TestPathFromVectors(TestCase):
         expected = [
             PathPoint(0, 0, 0), PathPoint(0, 1, 1), PathPoint(0, 2, 2),
             PathPoint(1, 2, 3), PathPoint(2, 2, 4), PathPoint(3, 2, 5)]
-        cardinal = CardinalPoint.North
+        cardinal = CardinalPoint.NORTH
         path = make_path_from_vectors(vectors, cardinal)
         self.assertListEqual(path, expected)
 
@@ -54,7 +54,7 @@ class TestPathFromVectors(TestCase):
         expected = [
             PathPoint(0, 0, 0), PathPoint(0, -1, 1), PathPoint(0, -2, 2),
             PathPoint(1, -2, 3), PathPoint(2, -2, 4), PathPoint(3, -2, 5)]
-        cardinal = CardinalPoint.South
+        cardinal = CardinalPoint.SOUTH
         path = make_path_from_vectors(vectors, cardinal)
         self.assertListEqual(path, expected)
 
@@ -65,7 +65,7 @@ class TestPath(TestCase):
         origin = PathPoint(0, 0, 0)
         self.assertListEqual(make_path(origin, ""), [origin])
 
-    def test_Right(self):
+    def test_RIGHT(self):
         origin = PathPoint(0, 0, 0)
         result = [
             origin, PathPoint(
@@ -76,7 +76,7 @@ class TestPath(TestCase):
                 5, 0, 5)]
         self.assertListEqual(make_path(origin, "R5"), result)
 
-    def test_East(self):
+    def test_EAST(self):
         origin = PathPoint(0, 0, 0)
         result = [
             origin, PathPoint(
@@ -85,9 +85,9 @@ class TestPath(TestCase):
                 3, 0, 3), PathPoint(
                 4, 0, 4), PathPoint(
                 5, 0, 5)]
-        self.assertListEqual(make_path(origin, "F5", CardinalPoint.East), result)
+        self.assertListEqual(make_path(origin, "F5", CardinalPoint.EAST), result)
 
-    def test_Left(self):
+    def test_LEFT(self):
         origin = PathPoint(2, 0, 0)
         result = [
             origin, PathPoint(1, 0, 1),
@@ -97,7 +97,7 @@ class TestPath(TestCase):
             PathPoint(-3, 0, 5)]
         self.assertListEqual(make_path(origin, "L5"), result)
 
-    def test_West(self):
+    def test_WEST(self):
         origin = PathPoint(2, 0, 0)
         result = [
             origin, PathPoint(1, 0, 1),
@@ -105,7 +105,7 @@ class TestPath(TestCase):
             PathPoint(-1, 0, 3),
             PathPoint(-2, 0, 4),
             PathPoint(-3, 0, 5)]
-        self.assertListEqual(make_path(origin, "F5", CardinalPoint.West), result)
+        self.assertListEqual(make_path(origin, "F5", CardinalPoint.WEST), result)
 
     def test_Up(self):
         origin = PathPoint(-2, -3, 0)
@@ -117,7 +117,7 @@ class TestPath(TestCase):
             PathPoint(-2, 2, 5)]
         self.assertListEqual(make_path(origin, "U5"), result)
 
-    def test_North(self):
+    def test_NORTH(self):
         origin = PathPoint(-2, -3, 0)
         result = [
             origin, PathPoint(-2, -2, 1),
@@ -125,7 +125,7 @@ class TestPath(TestCase):
             PathPoint(-2, 0, 3),
             PathPoint(-2, 1, 4),
             PathPoint(-2, 2, 5)]
-        self.assertListEqual(make_path(origin, "F5", CardinalPoint.North), result)
+        self.assertListEqual(make_path(origin, "F5", CardinalPoint.NORTH), result)
 
     def test_Down(self):
         origin = PathPoint(-2, 3, 0)
@@ -137,7 +137,7 @@ class TestPath(TestCase):
             PathPoint(-2, -2, 5)]
         self.assertListEqual(make_path(origin, "D5"), result)
 
-    def test_South(self):
+    def test_SOUTH(self):
         origin = PathPoint(-2, 3, 0)
         result = [
             origin, PathPoint(-2, 2, 1),
@@ -145,38 +145,38 @@ class TestPath(TestCase):
             PathPoint(-2, 0, 3),
             PathPoint(-2, -1, 4),
             PathPoint(-2, -2, 5)]
-        self.assertListEqual(make_path(origin, "F5", CardinalPoint.South), result)
+        self.assertListEqual(make_path(origin, "F5", CardinalPoint.SOUTH), result)
 
 
 class TestCardinalTurning(TestCase):
     def test_TurnNowhere(self):
-        self.assertEqual(CardinalPoint.North, turn(CardinalPoint.North, TurnDirection.Left, 0))
-        self.assertEqual(CardinalPoint.North, turn(CardinalPoint.North, TurnDirection.Right, 0))
-        self.assertEqual(CardinalPoint.East, turn(CardinalPoint.East, TurnDirection.Left, 0))
-        self.assertEqual(CardinalPoint.East, turn(CardinalPoint.East, TurnDirection.Right, 0))
-        self.assertEqual(CardinalPoint.West, turn(CardinalPoint.West, TurnDirection.Left, 0))
-        self.assertEqual(CardinalPoint.West, turn(CardinalPoint.West, TurnDirection.Right, 0))
-        self.assertEqual(CardinalPoint.South, turn(CardinalPoint.South, TurnDirection.Left, 0))
-        self.assertEqual(CardinalPoint.South, turn(CardinalPoint.South, TurnDirection.Right, 0))
+        self.assertEqual(CardinalPoint.NORTH, turn(CardinalPoint.NORTH, TurnDirection.LEFT, 0))
+        self.assertEqual(CardinalPoint.NORTH, turn(CardinalPoint.NORTH, TurnDirection.RIGHT, 0))
+        self.assertEqual(CardinalPoint.EAST, turn(CardinalPoint.EAST, TurnDirection.LEFT, 0))
+        self.assertEqual(CardinalPoint.EAST, turn(CardinalPoint.EAST, TurnDirection.RIGHT, 0))
+        self.assertEqual(CardinalPoint.WEST, turn(CardinalPoint.WEST, TurnDirection.LEFT, 0))
+        self.assertEqual(CardinalPoint.WEST, turn(CardinalPoint.WEST, TurnDirection.RIGHT, 0))
+        self.assertEqual(CardinalPoint.SOUTH, turn(CardinalPoint.SOUTH, TurnDirection.LEFT, 0))
+        self.assertEqual(CardinalPoint.SOUTH, turn(CardinalPoint.SOUTH, TurnDirection.RIGHT, 0))
 
     def test_TurnUnknownAmount(self):
-        self.assertRaises(ValueError, lambda: turn(CardinalPoint.North, TurnDirection.Right, 25))
+        self.assertRaises(ValueError, lambda: turn(CardinalPoint.NORTH, TurnDirection.RIGHT, 25))
 
-    def test_TurnRight(self):
-        self.assertEqual(CardinalPoint.East, turn(CardinalPoint.North, TurnDirection.Right, 90))
-        self.assertEqual(CardinalPoint.North, turn(CardinalPoint.West, TurnDirection.Right, 90))
-        self.assertEqual(CardinalPoint.East, turn(CardinalPoint.West, TurnDirection.Right, 180))
-        self.assertEqual(CardinalPoint.West, turn(CardinalPoint.East, TurnDirection.Right, 180))
-        self.assertEqual(CardinalPoint.South, turn(CardinalPoint.North, TurnDirection.Right, 180))
-        self.assertEqual(CardinalPoint.North, turn(CardinalPoint.South, TurnDirection.Right, 180))
+    def test_TurnRIGHT(self):
+        self.assertEqual(CardinalPoint.EAST, turn(CardinalPoint.NORTH, TurnDirection.RIGHT, 90))
+        self.assertEqual(CardinalPoint.NORTH, turn(CardinalPoint.WEST, TurnDirection.RIGHT, 90))
+        self.assertEqual(CardinalPoint.EAST, turn(CardinalPoint.WEST, TurnDirection.RIGHT, 180))
+        self.assertEqual(CardinalPoint.WEST, turn(CardinalPoint.EAST, TurnDirection.RIGHT, 180))
+        self.assertEqual(CardinalPoint.SOUTH, turn(CardinalPoint.NORTH, TurnDirection.RIGHT, 180))
+        self.assertEqual(CardinalPoint.NORTH, turn(CardinalPoint.SOUTH, TurnDirection.RIGHT, 180))
 
-    def test_TurnLeft(self):
-        self.assertEqual(CardinalPoint.South, turn(CardinalPoint.West, TurnDirection.Left, 90))
-        self.assertEqual(CardinalPoint.West, turn(CardinalPoint.North, TurnDirection.Left, 90))
-        self.assertEqual(CardinalPoint.East, turn(CardinalPoint.South, TurnDirection.Left, 90))
-        self.assertEqual(CardinalPoint.West, turn(CardinalPoint.East, TurnDirection.Left, 180))
-        self.assertEqual(CardinalPoint.North, turn(CardinalPoint.South, TurnDirection.Left, 180))
-        self.assertEqual(CardinalPoint.South, turn(CardinalPoint.North, TurnDirection.Left, 180))
+    def test_TurnLEFT(self):
+        self.assertEqual(CardinalPoint.SOUTH, turn(CardinalPoint.WEST, TurnDirection.LEFT, 90))
+        self.assertEqual(CardinalPoint.WEST, turn(CardinalPoint.NORTH, TurnDirection.LEFT, 90))
+        self.assertEqual(CardinalPoint.EAST, turn(CardinalPoint.SOUTH, TurnDirection.LEFT, 90))
+        self.assertEqual(CardinalPoint.WEST, turn(CardinalPoint.EAST, TurnDirection.LEFT, 180))
+        self.assertEqual(CardinalPoint.NORTH, turn(CardinalPoint.SOUTH, TurnDirection.LEFT, 180))
+        self.assertEqual(CardinalPoint.SOUTH, turn(CardinalPoint.NORTH, TurnDirection.LEFT, 180))
 
 
 class TestManhattanSort(TestCase):
@@ -200,8 +200,8 @@ class TestRotate(TestCase):
         down = Point(0, -1)
         left = Point(-1, 0)
         right = Point(1, 0)
-        clockwise = TurnDirection.Right
-        counterclockwise = TurnDirection.Left
+        clockwise = TurnDirection.RIGHT
+        counterclockwise = TurnDirection.LEFT
         self.assertEqual(up, rotate(origin, up, clockwise, 0))
         self.assertEqual(down, rotate(origin, down, clockwise, 0))
         self.assertEqual(left, rotate(origin, left, clockwise, 0))
@@ -213,8 +213,8 @@ class TestRotate(TestCase):
         down = Point(0, -1)
         left = Point(-1, 0)
         right = Point(1, 0)
-        clockwise = TurnDirection.Right
-        counterclockwise = TurnDirection.Left
+        clockwise = TurnDirection.RIGHT
+        counterclockwise = TurnDirection.LEFT
         self.assertEqual(down, rotate(origin, up, clockwise, 180))
         self.assertEqual(up, rotate(origin, down, clockwise, 180))
         self.assertEqual(right, rotate(origin, left, clockwise, 180))
@@ -230,8 +230,8 @@ class TestRotate(TestCase):
         down = Point(0, -1)
         left = Point(-1, 0)
         right = Point(1, 0)
-        clockwise = TurnDirection.Right
-        counterclockwise = TurnDirection.Left
+        clockwise = TurnDirection.RIGHT
+        counterclockwise = TurnDirection.LEFT
         self.assertEqual(right, rotate(origin, up, clockwise, 90))
         self.assertEqual(left, rotate(origin, down, clockwise, 90))
         self.assertEqual(up, rotate(origin, left, clockwise, 90))
@@ -247,8 +247,8 @@ class TestRotate(TestCase):
         down = Point(0, -1)
         left = Point(-1, 0)
         right = Point(1, 0)
-        clockwise = TurnDirection.Right
-        counterclockwise = TurnDirection.Left
+        clockwise = TurnDirection.RIGHT
+        counterclockwise = TurnDirection.LEFT
         self.assertEqual(right, rotate(origin, up, counterclockwise, 270))
         self.assertEqual(left, rotate(origin, down, counterclockwise, 270))
         self.assertEqual(up, rotate(origin, left, counterclockwise, 270))
@@ -261,16 +261,16 @@ class TestRotate(TestCase):
     def test_off_axis(self):
         origin = Point(0, 0)
         start = Point(4, 1)
-        clockwise = TurnDirection.Right
-        counterclockwise = TurnDirection.Left
+        clockwise = TurnDirection.RIGHT
+        counterclockwise = TurnDirection.LEFT
         self.assertEqual(Point(1, -4), rotate(origin, start, clockwise, 90))
         self.assertEqual(Point(-1, 4), rotate(origin, start, counterclockwise, 90))
 
     def test_off_axis_off_origin(self):
         origin = Point(2, 2)
         start = Point(6, 3)
-        clockwise = TurnDirection.Right
-        counterclockwise = TurnDirection.Left
+        clockwise = TurnDirection.RIGHT
+        counterclockwise = TurnDirection.LEFT
         self.assertEqual(Point(3, -2), rotate(origin, start, clockwise, 90))
         self.assertEqual(Point(1, 6), rotate(origin, start, counterclockwise, 90))
 
@@ -278,5 +278,5 @@ class TestRotate(TestCase):
         origin = Point(0, 0)
         start = Point(10, 4)
         final = Point(4, -10)
-        clockwise = TurnDirection.Right
+        clockwise = TurnDirection.RIGHT
         self.assertEqual(final, rotate(origin, start, clockwise, 90))

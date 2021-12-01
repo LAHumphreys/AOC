@@ -55,7 +55,7 @@ def get_seat(code):
 
 if __name__ == "__main__":
     def main():
-        with open("input/d05.txt") as file_handle:
+        with open("input/d05.txt", encoding="ascii") as file_handle:
             max_seat = (0, 0, 0)
             all_seats = {}
             for i in range(128):
@@ -70,11 +70,11 @@ if __name__ == "__main__":
                 row_seats.append(this_seat[1])
             print(max_seat)
 
-            for row in all_seats:
-                cols = all_seats[row]
+            for row in all_seats.items():
+                cols = row[1]
                 if len(cols) != 8:
                     cols.sort()
-                    print("incomplete row {0}: {1}".format(row, cols))
+                    print("incomplete row {0}: {1}".format(row[0], row[1]))
 
 
     main()

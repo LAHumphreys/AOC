@@ -34,11 +34,11 @@ def count_trees(inp, delta_x, delta_y):
 if __name__ == "__main__":
     def main():
         coords = []
-        file_handle = open("input/d03.txt")
-        for lin in file_handle.readlines():
-            if lin[-1] == "\n":
-                lin = lin[0:-1]
-            coords.append(lin)
+        with open("input/d03.txt", encoding="ascii") as file_handle:
+            for lin in file_handle.readlines():
+                if lin[-1] == "\n":
+                    lin = lin[0:-1]
+                coords.append(lin)
         slopes = [
             [1, 1],
             [3, 1],
@@ -52,4 +52,4 @@ if __name__ == "__main__":
             trees = count_trees(coords, x_point, y_point)
             total *= trees
             print("Trees ({0}, {1}): {2} ({3})".format(x_point, y_point, trees, total))
-        main()
+    main()
