@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Callable, List, Tuple, Set, Dict
+from copy import copy
 
 
 @dataclass
@@ -111,22 +112,26 @@ def chain_frames(reference: Frame, frame: Frame) -> Frame:
 
 
 def find_unique_points(scanners: List[ScannerReadout]) -> Tuple[Set[Point], Dict[str, Frame]]:
-    aligned_scanners = [scanners[0]]
     ref_frames = {
         scanners[0].name: Frame(x=0, y=0, z=0)
     }
 
     to_align = scanners[1:]
+    aligned_scanners = []
+    newly_aligned = [scanners[0]]
     while to_align:
+        check_this_time = copy(newly_aligned)
+        aligned_scanners += newly_aligned
+        newly_aligned = []
         print("Aligned {0} of {1} scanners".format(len(aligned_scanners), len(scanners)))
         unaligned_beacons = []
         for working_scanner in to_align:
             print("Attempting to align: " + working_scanner.name)
             aligned = False
-            for ref_scanner in aligned_scanners:
+            for ref_scanner in check_this_time:
                 try:
                     working_frame, working_orientation = find_reference_frame(ref_scanner, working_scanner, 12)
-                    aligned_scanners.append(realign_scanner(working_scanner, working_orientation))
+                    newly_aligned.append(realign_scanner(working_scanner, working_orientation))
                     ref_frames[working_scanner.name] =\
                         chain_frames(ref_frames[ref_scanner.name], working_frame)
                     aligned = True
@@ -136,6 +141,8 @@ def find_unique_points(scanners: List[ScannerReadout]) -> Tuple[Set[Point], Dict
             if not aligned:
                 unaligned_beacons.append(working_scanner)
         to_align = unaligned_beacons
+    aligned_scanners += newly_aligned
+
 
     if len(aligned_scanners) != len(scanners):
         raise Unhandled
