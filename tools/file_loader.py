@@ -47,6 +47,27 @@ def load_lists(file):
     return result
 
 
+def load_int_groups(file: str) -> list[list[int]]:
+    """
+    Split a file into sets of ints (separated by a blank line)
+    The result is a list of lists. Where each inner list is the
+    list of the ints on each line. E.g:
+        1
+        2
+        3
+
+        3
+        4
+
+        6
+        => [[1, 2 ,3], [3, 4], [6]]
+    """
+    string_groups = load_string_groups(file)
+    result = []
+    for group in string_groups:
+        result.append([int(x) for x in group])
+    return result
+
 def load_string_groups(file):
     """
     Split a file into paragraphs (separated by a blank line)

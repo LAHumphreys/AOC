@@ -5,7 +5,7 @@ from aoc2020.d02 import SPLIT_REGEX
 from tests.toolsTests.tools_common import GetTestFilePath
 from tools.file_loader import UnexpectedLineFormat, UnexpectedNumberOfRows
 from tools.file_loader import load_ints, load_int_list, load_lists, load_patterns, load_dicts, load_string_groups
-from tools.file_loader import load_one
+from tools.file_loader import load_one, load_int_groups
 
 
 class TestLoadInts(TestCase):
@@ -26,8 +26,30 @@ class TestLoadInts(TestCase):
                 50962, 126857, -127476, 136169, -62054, 116866, 123235])
 
     def test_detect_floats(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError):
             load_ints(GetTestFilePath("input/ints/hasFloat"))
+
+
+class TestLoadIntGroups(TestCase):
+    def test_load_ints(self):
+        ints = load_int_groups(GetTestFilePath("input/intGroups/123"))
+        self.assertListEqual(ints, [[1, 2],  [3, 4, 5], [6]])
+
+    def test_load_biggerInts(self):
+        ints = load_int_groups(GetTestFilePath("input/intGroups/biggerInts"))
+        self.assertListEqual(
+            ints, [
+                [50962, 126857],  [127476], [136169, 62054, 116866, 123235]])
+
+    def test_load_negativeInts(self):
+        ints = load_int_groups(GetTestFilePath("input/intGroups/negativeInts"))
+        self.assertListEqual(
+            ints, [
+                [50962, 126857, -127476], [136169, -62054, 116866, 123235]])
+
+    def test_detect_floats(self):
+        with self.assertRaises(ValueError):
+            load_int_groups(GetTestFilePath("input/intGroups/hasFloat"))
 
 
 class TestLoadIntList(TestCase):
@@ -48,7 +70,7 @@ class TestLoadIntList(TestCase):
                 50962, 126857, -127476, 136169, -62054, 116866, 123235])
 
     def test_detect_floats(self):
-        with self.assertRaises(ValueError) as context:
+        with self.assertRaises(ValueError):
             load_int_list(GetTestFilePath("input/intLIst/hasFloat"))
 
 
@@ -145,7 +167,7 @@ class TestLoadPaterns(TestCase):
         self.assertRaises(UnexpectedNumberOfRows, loader)
 
     def test_load_invalidLine(self):
-        with self.assertRaises(UnexpectedLineFormat) as context:
+        with self.assertRaises(UnexpectedLineFormat):
             load_patterns(SPLIT_REGEX,
                           GetTestFilePath("input/patterns/invalidLine"))
 
