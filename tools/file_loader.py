@@ -68,6 +68,7 @@ def load_int_groups(file: str) -> list[list[int]]:
         result.append([int(x) for x in group])
     return result
 
+
 def load_string_groups(file):
     """
     Split a file into paragraphs (separated by a blank line)
@@ -150,7 +151,7 @@ def load_dicts(file):
     Load a text file where each paragraph (separated by a blank line)
     is interpreted as a set of key value pairs.
 
-    e.g
+    e.g.
        k1:v1 k2:v2
        k3:v3
 

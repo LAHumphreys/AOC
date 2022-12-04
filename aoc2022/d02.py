@@ -1,15 +1,14 @@
-from tools.file_loader import load_int_groups
 from dataclasses import dataclass
-from enum import Enum
+from enum import IntEnum
 
 
-class RPS(Enum):
+class RPS(IntEnum):
     ROCK: int = 1
     PAPER: int = 2
     SCISSORS: int = 3
 
 
-class Result(Enum):
+class Result(IntEnum):
     WIN: int = 6
     DRAW: int = 3
     LOSE: int = 0
@@ -57,34 +56,34 @@ def load_rounds_2(path: str) -> list[Round2]:
 
 def play(you: RPS, opponent: RPS) -> int:
     if you == opponent:
-        return 3 + you.value
-    elif (you.value % 3) + 1 == opponent.value:
-        return you.value
+        return 3 + you
+    elif (you % 3) + 1 == opponent:
+        return you
     else:
-        return 6 + you.value
+        return 6 + you
 
 
 def play_2(opponent: RPS, result: Result) -> int:
     if result == result.DRAW:
-        return 3 + opponent.value
+        return 3 + opponent
     elif result == result.LOSE:
         if opponent == RPS.ROCK:
             return 3
         else:
-            return opponent.value - 1
+            return opponent - 1
     else:
         if opponent == RPS.SCISSORS:
             return 7
         else:
-            return 6 + opponent.value + 1
+            return 6 + opponent + 1
 
 
-def play_rounds(rounds: list[Round]) -> int:
-    return sum(play(round.you, round.opponent) for round in rounds)
+def play_rounds(games: list[Round]) -> int:
+    return sum(play(game.you, game.opponent) for game in games)
 
 
-def play_rounds_2(rounds: list[Round2]) -> int:
-    return sum(play_2(round.opponent, round.result) for round in rounds)
+def play_rounds_2(games: list[Round2]) -> int:
+    return sum(play_2(game.opponent, game.result) for game in games)
 
 
 if __name__ == "__main__":

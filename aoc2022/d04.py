@@ -39,5 +39,4 @@ if __name__ == "__main__":
         print(count_partial_overlap(load_pairs("input/d04.txt")))
         pass
 
-
     main()

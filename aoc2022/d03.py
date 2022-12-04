@@ -1,7 +1,4 @@
-from tools.file_loader import load_string_groups
 from dataclasses import dataclass
-from enum import Enum
-from typing import Iterator
 
 
 @dataclass
@@ -9,6 +6,9 @@ class RuckSack:
     all_items: list[int]
     first: list[int]
     last: list[int]
+
+
+Group = tuple[RuckSack, RuckSack, RuckSack]
 
 
 def load_rucksacks(path: str) -> list[RuckSack]:
@@ -24,11 +24,11 @@ def load_rucksacks(path: str) -> list[RuckSack]:
     return packs
 
 
-def get_groups(packs: list[RuckSack]) -> list[tuple[RuckSack, RuckSack, RuckSack]]:
-    return [(packs[i], packs[i+1], packs[i+2]) for i in range (0, len(packs), 3)]
+def get_groups(packs: list[RuckSack]) -> list[Group]:
+    return [(packs[i], packs[i + 1], packs[i + 2]) for i in range(0, len(packs), 3)]
 
 
-def get_badge(packs: tuple[RuckSack]) -> int:
+def get_badge(packs: Group) -> int:
     iters = [iter(pack.all_items) for pack in packs]
 
     iter_values = tuple([next(i), i] for i in iters)
