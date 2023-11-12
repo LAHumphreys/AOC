@@ -35,8 +35,8 @@ def is_pass_valid_part_2(split_groups):
     if upper >= len(passwd):
         valid = False
     else:
-        has_lower = (passwd[lower] == char)
-        has_upper = (passwd[upper] == char)
+        has_lower = passwd[lower] == char
+        has_upper = passwd[upper] == char
         if has_lower and has_upper:
             valid = False
         elif not has_lower and not has_upper:

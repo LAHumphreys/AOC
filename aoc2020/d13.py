@@ -54,7 +54,7 @@ def find_next_departure(start_time, bus_1_period, bus_2_period, bus_2_delay):
 
     # If we're asked to wait for longer than bus_2's departure period,
     # we actually need to wait for several busses to depart...
-    bus_2_period = (bus_2_period * (1 + bus_2_delay // bus_2_period))
+    bus_2_period = bus_2_period * (1 + bus_2_delay // bus_2_period)
 
     while time_to_wait(bus_2_period, current_time) != bus_2_delay:
         current_time += bus_1_period

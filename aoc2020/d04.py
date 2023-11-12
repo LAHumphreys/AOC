@@ -65,11 +65,11 @@ def validate_item(key, value):
     elif key == "hgt":
         result = check_hgt(value)
     elif key == "hcl":
-        result = (HCL_PATTERN.match(value) is not None)
+        result = HCL_PATTERN.match(value) is not None
     elif key == "ecl":
-        result = (value in EYE_COLOUR)
+        result = value in EYE_COLOUR
     elif key == "pid":
-        result = (PID_PATTERN.match(value) is not None)
+        result = PID_PATTERN.match(value) is not None
     else:
         raise UnknownKey
 

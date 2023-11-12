@@ -20,7 +20,7 @@ class Instruction:
 
     def get_op_code(self):
         if self.op_code is None:
-            self.op_code = (self.code % 100)
+            self.op_code = self.code % 100
         return self.op_code
 
     def get_value(self):
