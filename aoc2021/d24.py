@@ -285,7 +285,7 @@ def apply_bounded_instruction(target: BoundedValue, source: BoundedValue, i_type
             target.max = 1
     elif i_type == InstructionType.MOD:
         if target.min == target.max and source.min == source.max:
-            target.max = target.min = (target.min % source.min)
+            target.max = target.min = target.min % source.min
         elif target.max < source.min:
             # No change to target's values
             pass
