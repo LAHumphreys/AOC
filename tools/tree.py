@@ -285,14 +285,14 @@ class KeyedTree:
         while not found and source_index < (len(source_hist) - 1):
             source_index += 1
             s_ancestor = source_hist[source_index]
-            found = (s_ancestor in dest_hist)
+            found = s_ancestor in dest_hist
 
         if found:
             found = False
             while not found and destination_index < (len(dest_hist) - 1):
                 destination_index += 1
                 d_ancestor = dest_hist[destination_index]
-                found = (d_ancestor == s_ancestor)
+                found = d_ancestor == s_ancestor
 
             path = source_hist[0:source_index]
             while destination_index >= 0:
