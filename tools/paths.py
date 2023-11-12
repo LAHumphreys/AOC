@@ -164,7 +164,7 @@ def make_path(origin: PathPoint, code: str, direction: CardinalPoint = None):
         delta_y = 0
         path_len = int(code[1:])
         letter = code[0]
-        is_forward = (letter == "F")
+        is_forward = letter == "F"
         if letter == "R" or (is_forward and direction == CardinalPoint.EAST):
             delta_x = 1
         elif letter == "L" or (is_forward and direction == CardinalPoint.WEST):
