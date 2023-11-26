@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='AOC',
-    version='',
+    version='2023.1',
     packages=['tests',
               'tests.toolsTests',
               'tests.aoc2019Tests',
