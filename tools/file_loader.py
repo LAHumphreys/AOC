@@ -69,7 +69,7 @@ def load_int_groups(file: str) -> list[list[int]]:
     return result
 
 
-def load_string_groups(file):
+def load_string_groups(file) -> list[list[str]]:
     """
     Split a file into paragraphs (separated by a blank line)
     The result is a list of lists. Where each inner list is the
