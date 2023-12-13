@@ -1,6 +1,7 @@
 from unittest import TestCase
 
-from aoc2023.d12 import spring_possibilities, trim_groups, load_springs, part_one
+from aoc2023.d12 import spring_possibilities, trim_groups, load_springs, part_one, SpringMap, expand_spring
+from aoc2023.d12 import part_two
 from tests.aoc2023Tests.aoc2023_common import get_test_file_path
 
 
@@ -79,7 +80,19 @@ class TestGeneration(TestCase):
             [])
 
     def test_example_2(self):
+        print([x for x in spring_possibilities(".??..??...?##.", [1, 1, 3])])
         self.assertEqual(len([x for x in spring_possibilities(".??..??...?##.", [1, 1, 3])]), 4)
+
+
+    def test_expand(self):
+        short = SpringMap(row="???.###", groups=[1,1,3])
+        expanded = expand_spring(short)
+        self.assertEqual(expanded.row, "???.###????.###????.###????.###????.###")
+        self.assertEqual(expanded.groups, [1,1,3,1,1,3,1,1,3,1,1,3,1,1,3])
+    def test_example_2_expanded(self):
+        short = SpringMap(row=".??..??...?##.", groups=[1, 1, 3])
+        expanded = expand_spring(short)
+        self.assertEqual(sum([1 for _ in spring_possibilities(expanded.row, expanded.groups)]), 16384)
 
     def test_example_3(self):
         self.assertEqual(len([x for x in spring_possibilities("?#?#?#?#?#?#?#?", [1,3,1,6])]), 1)
@@ -108,3 +121,7 @@ class TestProblem(TestCase):
     def test_part_one(self):
         springs = load_springs(get_test_file_path("samples/d12.txt"))
         self.assertEqual(part_one(springs), 21)
+
+    def test_part_two(self):
+        springs = load_springs(get_test_file_path("samples/d12.txt"))
+        self.assertEqual(part_two(springs), 525152)
