@@ -90,12 +90,17 @@ def spring_possibilities(in_row: str, groups: list[int]) -> str:
         start_idx = 0
         valid = True
         for group in groups:
-            search_string = "#"*group
-            next_idx = row.find(search_string, start_idx) + group
+            next_idx = row.find("#", start_idx) + group
             if next_idx < len(row) and row[next_idx] != ".":
                 valid = False
                 break
-            if start_idx < 0 or next_idx < start_idx:
+            elif next_idx - group < 0:
+                valid = False
+                break
+            elif row[next_idx-group: next_idx] != "#"*group:
+                valid = False
+                break
+            elif next_idx < group:
                 valid = False
                 break
             start_idx = next_idx
