@@ -49,6 +49,19 @@ def make_key(row: str, groups: list[int]):
     return key
 
 
+def subtract_groups(full_groups: list[int], trail_groups: list[int]):
+    remainder = copy(full_groups)
+    if not trail_groups:
+        return remainder
+    for i in range(len(trail_groups)-1):
+        remainder.pop()
+    if remainder[-1] == trail_groups[0]:
+        remainder.pop()
+    else:
+        remainder[-1] -= trail_groups[0]
+    return remainder
+
+
 TRIM_CACHE: dict[str, list[int]] = {}
 
 
@@ -90,60 +103,99 @@ def wrapped_possibilities(prefix: str, suffix: str, groups: list[int], cache: di
         yield prefix + after
 
 
-SMALL_ITEM_CACHE: dict[str, list[str]] = {}
+COUNT_CACHE: dict[str, int] = {}
+
+
+def count_possibilities(in_row: str, groups: list[int]) -> int:
+    key = make_key(in_row, groups)
+    if key in COUNT_CACHE:
+        return COUNT_CACHE[key]
+
+    count = 0
+    first_unknown = in_row.find("?")
+    if first_unknown >= 0:
+        slice_before = in_row[:first_unknown]
+        slice_after = in_row[first_unknown+1:]
+        for x in [".", "#"]:
+            before = slice_before + x
+            after_groups = trim_groups(before, groups)
+            before_groups = subtract_groups(groups, after_groups)
+            valid_split = True
+            if x == "#":
+                if not before_groups:
+                    valid_split = False
+                else:
+                    if after_groups:
+                        trail_group_len = after_groups[0]
+                        marked_len = 1
+                        prefix = ""
+                        if before_groups[-1] != groups[len(before_groups)-1]:
+                            while valid_split and marked_len <= trail_group_len:
+                                if (marked_len-1) >= len(slice_after) or slice_after[marked_len-1] == ".":
+                                    valid_split = False
+                                else:
+                                    prefix += "#"
+                                marked_len += 1
+
+                        if marked_len <= len(slice_after):
+                            if slice_after[marked_len-1] == "#":
+                                valid_split = False
+                            else:
+                                prefix += "."
+                        slice_after = prefix + slice_after[len(prefix):]
+
+            if valid_split:
+                rhs_count = count_possibilities(slice_after, after_groups)
+                # LHS couldbe invalid (so 1 or 0)
+                lhs_count = count_possibilities(before, before_groups)
+                print(f"Count: {in_row}: {groups} => (+{x}) {before}: {before_groups} + {slice_after}: {after_groups} ({lhs_count*rhs_count})")
+                count += lhs_count*rhs_count
+    else:
+        count = sum(1 for _ in spring_possibilities(in_row, groups))
+    COUNT_CACHE[key] = count
+    return count
 
 
 def spring_possibilities(in_row: str, groups: list[int], cache: dict[str, list[str]] = None) -> str:
-    if cache is None:
-        cache = {}
     key = make_key(in_row, groups)
-    if key in SMALL_ITEM_CACHE:
-        for row in SMALL_ITEM_CACHE[key]:
-            yield row
-    elif key in cache:
-        for row in cache[key]:
-            yield row
+    first_unknown = in_row.find("?")
+    if first_unknown >= 0:
+        slice_before = in_row[:first_unknown]
+        slice_after = in_row[first_unknown+1:]
+        row_gens = []
+        for x in [".", "#"]:
+            before = slice_before + x
+            after_groups = trim_groups(before, groups)
+            row_gens += [wrapped_possibilities(before, slice_after, after_groups, cache)]
+        rows = chain(*row_gens)
     else:
-        first_unknown = in_row.find("?")
-        if first_unknown >= 0:
-            slice_before = in_row[:first_unknown]
-            slice_after = in_row[first_unknown+1:]
-            row_gens = []
-            for x in [".", "#"]:
-                before = slice_before + x
-                after_groups = trim_groups(before, groups)
-                row_gens += [wrapped_possibilities(before, slice_after, after_groups, cache)]
-            rows = chain(*row_gens)
-        else:
-            rows = [in_row]
+        rows = [in_row]
 
-        valid_rows = []
-        for row in rows:
-            start_idx = 0
-            valid = True
-            for group in groups:
-                next_idx = row.find("#", start_idx) + group
-                if next_idx < len(row) and row[next_idx] != ".":
-                    valid = False
-                    break
-                elif next_idx - group < 0:
-                    valid = False
-                    break
-                elif row[next_idx-group: next_idx] != "#"*group:
-                    valid = False
-                    break
-                elif next_idx < group:
-                    valid = False
-                    break
-                start_idx = next_idx
-            if "#" in row[start_idx:]:
+    valid_rows = 0
+    for row in rows:
+        start_idx = 0
+        valid = True
+        for group in groups:
+            next_idx = row.find("#", start_idx) + group
+            if next_idx < len(row) and row[next_idx] != ".":
                 valid = False
-            if valid:
-                valid_rows.append(row)
-                yield row
-        cache[key] = valid_rows
-        if len(valid_rows) < 1000:
-            SMALL_ITEM_CACHE[key] = valid_rows
+                break
+            elif next_idx - group < 0:
+                valid = False
+                break
+            elif row[next_idx-group: next_idx] != "#"*group:
+                valid = False
+                break
+            elif next_idx < group:
+                valid = False
+                break
+            start_idx = next_idx
+        if "#" in row[start_idx:]:
+            valid = False
+        if valid:
+            valid_rows += 1
+            yield row
+    COUNT_CACHE[key] = valid_rows
 
 
 def main():
