@@ -98,7 +98,7 @@ class TestGeneration(TestCase):
     def test_example_2_expanded(self):
         short = SpringMap(row=".??..??...?##.", groups=[1, 1, 3])
         expanded = expand_spring(short)
-        self.assertEqual(sum([1 for _ in spring_possibilities(expanded.row, expanded.groups)]), 16384)
+        self.assertEqual(count_possibilities(expanded.row, expanded.groups), 16384)
 
     def test_example_3(self):
         self.assertEqual(len([x for x in spring_possibilities("?#?#?#?#?#?#?#?", [1,3,1,6])]), 1)

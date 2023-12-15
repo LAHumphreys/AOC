@@ -28,7 +28,7 @@ def part_one(springs: list[SpringMap]) -> int:
     total = 0
     count = 0
     for spring in springs:
-        total += sum(1 for _ in spring_possibilities(spring.row, spring.groups))
+        total += count_possibilities(spring.row, spring.groups)
         count += 1
         print(f"{count}: {total}")
     return total
@@ -38,7 +38,7 @@ def part_two(springs: list[SpringMap]) -> int:
     total = 0
     count = 0
     for spring in (expand_spring(spring) for spring in springs):
-        total += sum(1 for _ in spring_possibilities(spring.row, spring.groups))
+        total += count_possibilities(spring.row, spring.groups)
         count += 1
         print(f"{count}: {total}")
     return total
@@ -148,7 +148,7 @@ def count_possibilities(in_row: str, groups: list[int]) -> int:
                 rhs_count = count_possibilities(slice_after, after_groups)
                 # LHS couldbe invalid (so 1 or 0)
                 lhs_count = count_possibilities(before, before_groups)
-                print(f"Count: {in_row}: {groups} => (+{x}) {before}: {before_groups} + {slice_after}: {after_groups} ({lhs_count*rhs_count})")
+                #print(f"Count: {in_row}: {groups} => (+{x}) {before}: {before_groups} + {slice_after}: {after_groups} ({lhs_count*rhs_count})")
                 count += lhs_count*rhs_count
     else:
         count = sum(1 for _ in spring_possibilities(in_row, groups))
