@@ -1,5 +1,6 @@
-from tools.file_loader import load_lists
 from dataclasses import dataclass
+
+from tools.file_loader import load_lists
 
 
 @dataclass
@@ -37,6 +38,5 @@ if __name__ == "__main__":
     def main():
         print(count_overlap(load_pairs("input/d04.txt")))
         print(count_partial_overlap(load_pairs("input/d04.txt")))
-        pass
 
     main()

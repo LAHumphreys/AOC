@@ -1,4 +1,3 @@
-from enum import Enum
 from dataclasses import dataclass
 from itertools import combinations
 from copy import deepcopy
@@ -11,7 +10,7 @@ class UniverseLocation:
 
 
 def load_galaxy(file_name: str) -> list[str]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         return [ln.replace("\n", "") for ln in input_file.readlines()]
 
 
@@ -22,7 +21,7 @@ def expand_universe(universe: list[str], expansion_size: int = 1) -> list[str]:
             expanded.append(deepcopy(row))
         else:
             expanded.append(deepcopy(row))
-            for i in range(expansion_size):
+            for _ in range(expansion_size):
                 expanded.append(deepcopy(row))
     universe = expanded
     expanded = [""] * len(universe)
@@ -35,7 +34,7 @@ def expand_universe(universe: list[str], expansion_size: int = 1) -> list[str]:
             expanded[y] += location
         if empty:
             for y in range(len(universe)):
-                for i in range(expansion_size):
+                for _ in range(expansion_size):
                     expanded[y] += "."
 
     return expanded

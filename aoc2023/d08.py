@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from tools.file_loader import load_string_groups
 from math import lcm
+
+from tools.file_loader import load_string_groups
 
 
 @dataclass
@@ -26,40 +27,39 @@ def load_map(file_name:str) -> Map:
     return Map(nodes=node_map, directions=directions[0])
 
 
-def part_one(map: Map, start_node: str="AAA") -> int:
+def part_one(node_map: Map, start_node: str="AAA") -> int:
     steps = 0
     node_id = start_node
-    num_directions = len(map.directions)
+    num_directions = len(node_map.directions)
     while node_id != "ZZZ":
-        if map.directions[steps%num_directions] == "L":
-            node_id = map.nodes[node_id].left
+        if node_map.directions[steps%num_directions] == "L":
+            node_id = node_map.nodes[node_id].left
         else:
-            node_id = map.nodes[node_id].right
+            node_id = node_map.nodes[node_id].right
         steps += 1
     return steps
 
 
-def part_two(map: Map) -> int:
-    current_nodes = [node_id for node_id in map.nodes.keys() if node_id[-1] == "A"]
-    num_directions = len(map.directions)
+def part_two(node_map: Map) -> int:
+    current_nodes = [node_id for node_id in node_map.nodes.keys() if node_id[-1] == "A"]
+    num_directions = len(node_map.directions)
     part_one_steps = []
     for node_id in current_nodes:
         steps = 0
         while node_id[-1] != "Z":
-            if map.directions[steps % num_directions] == "L":
-                node_id = map.nodes[node_id].left
+            if node_map.directions[steps % num_directions] == "L":
+                node_id = node_map.nodes[node_id].left
             else:
-                node_id = map.nodes[node_id].right
+                node_id = node_map.nodes[node_id].right
             steps += 1
         part_one_steps.append(steps)
     return lcm(*part_one_steps)
 
 
 def main():
-    map = load_map("input/d08.txt")
-    print(part_one(map))
-    print(part_two(map))
-    pass
+    node_map = load_map("input/d08.txt")
+    print(part_one(node_map))
+    print(part_two(node_map))
 
 
 if __name__ == "__main__":

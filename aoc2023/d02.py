@@ -28,7 +28,7 @@ def parse_rounds(round_strings: str) -> [Round]:
 
 
 def load_games(file_name) -> list[Game]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         lines = [ln.replace("\n", "") for ln in input_file.readlines()]
         game_input = {game[5:]: rounds for game, rounds in [ln.split(":") for ln in lines]}
         return [Game(id=int(game_id),
@@ -36,9 +36,9 @@ def load_games(file_name) -> list[Game]:
 
 
 def game_valid_for_part_one(game: Game) -> bool:
-    return all([all([g_round.red <= 12,
+    return all(all([g_round.red <= 12,
                      g_round.green <= 13,
-                     g_round.blue <= 14]) for g_round in game.rounds])
+                     g_round.blue <= 14]) for g_round in game.rounds)
 
 
 def part_one(games: list[Game]) -> int:

@@ -1,6 +1,4 @@
-from enum import Enum
 from dataclasses import dataclass
-from copy import deepcopy
 
 
 @dataclass
@@ -11,7 +9,7 @@ class Garden:
 
 
 def load_garden(file_name) -> Garden:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         plot = [line.replace("\n", "").replace("S", "O") for line in input_file.readlines()]
         return Garden(
             plots=plot, len_x=len(plot[0]), len_y=len(plot))
@@ -21,11 +19,11 @@ def expand_garden(garden: Garden) -> Garden:
     plots = [row.replace("O", ".")*5 for row in garden.plots]
     plots = plots * 5
     # OK - but we need to replace the S
-    for x, row in enumerate(garden.plots):
+    for _, row in enumerate(garden.plots):
         for y, space in enumerate(row):
             if space == "O":
-                without_S = row.replace("O", ".")
-                plots[y+2*garden.len_y] = without_S*2 + row + without_S*2
+                without_s = row.replace("O", ".")
+                plots[y+2*garden.len_y] = without_s*2 + row + without_s*2
 
     return Garden(plots=plots, len_x=len(plots[0]), len_y=len(plots))
 
@@ -42,7 +40,7 @@ def mark_possible_steps(plot: list[list[str]], x: int, y: int, max_x: int, max_y
 
 
 def apply_step(garden: Garden) -> Garden:
-    new_plot = [[x for x in row.replace("O", ".")] for row in garden.plots]
+    new_plot = [list(row.replace("O", ".")) for row in garden.plots]
     for y, row in enumerate(garden.plots):
         for x, space in enumerate(row):
             if space == "O":
@@ -80,7 +78,6 @@ def part_one(garden: Garden) -> int:
 def main():
     garden = load_garden("input/d21.txt")
     print(part_one(garden))
-    pass
 
 
 if __name__ == "__main__":

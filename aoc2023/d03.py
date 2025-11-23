@@ -27,7 +27,7 @@ def is_valid_part(start_idx: int, stop_idx: int, row: int, blue_print: BluePrint
     row_map = blue_print.row_maps[row]
     row_map_after = blue_print.row_maps[min(row+1, blue_print.max_row)]
     row_map_before = blue_print.row_maps[max(row-1, 0)]
-    consolidated_row_map = [x for x in map(any, zip(row_map, row_map_after, row_map_before))]
+    consolidated_row_map = list(map(any, zip(row_map, row_map_after, row_map_before)))
     return any(map(lambda i: consolidated_row_map[i], range(start_idx, stop_idx+1)))
 
 
@@ -47,7 +47,7 @@ def map_row(line: str) -> list[bool]:
     symbols = [is_symbol(token) for token in line]
     prior = [False] + symbols
     after = symbols[1:] + [False]
-    return [valid for valid in map(any, zip(prior, symbols, after))]
+    return list(map(any, zip(prior, symbols, after)))
 
 
 @dataclass
@@ -98,7 +98,7 @@ def get_ratios(blue_print: BluePrint, gear: Gear) -> list[int]:
 
 
 def load_blue_print(file_name: str) -> BluePrint:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         lines = [line.replace("\n", "") for line in input_file.readlines()]
         return BluePrint(
             max_x=len(lines[0]) - 1,
@@ -132,7 +132,6 @@ def main():
     blue_print = load_blue_print("input/d03.txt")
     print(part_one(blue_print))
     print(part_two(blue_print))
-    pass
 
 
 if __name__ == "__main__":

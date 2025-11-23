@@ -39,8 +39,6 @@ class Switch:
 
 
 class SinkSwitch(Switch):
-    def __init__(self, key: str):
-        super().__init__(key)
 
     def input_pulse(self, source: str, high: bool, output: list[Signal]):
         pass
@@ -62,7 +60,7 @@ class FlipFlop(Switch):
             return
         self.on = not self.on
         for client_key in self.clients:
-            high = True if self.on else False
+            high = bool(self.on)
             output += [Signal(source=self.id, high=high, target=client_key)]
 
     def state_string(self):
@@ -78,7 +76,6 @@ class Broadcaster(Switch):
     def input_pulse(self, source: str, high: bool, output: list[Signal]):
         for client_key in self.clients:
             output += [Signal(source=self.id, high=high, target=client_key)]
-        pass
 
 
 class Conjunction(Switch):
@@ -88,14 +85,12 @@ class Conjunction(Switch):
 
     def register_input(self, key: str):
         self.state[key] = False
-        pass
 
     def input_pulse(self, source: str, high: bool, output: list[Signal]):
         self.state[source] = high
         for client_key in self.clients:
             high = not all(self.state.values())
             output += [Signal(source=self.id, high=high, target=client_key)]
-        pass
 
     def state_string(self):
         state = super().state_string()
@@ -158,7 +153,7 @@ def count_pulses(switches: SwitchSet) -> tuple[int, int]:
 
 
 def load_switches(file_name: str) -> SwitchSet:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         switches = [parse_input_line(line.strip(" \n")) for line in input_file.readlines()]
 
     switch_map = SwitchSet(switches={switch.id: switch for switch in switches})
@@ -177,7 +172,6 @@ def get_state_key(switches: SwitchSet) -> str:
 def main():
     switches = load_switches("input/d20.txt")
     print(press_the_button(switches, 1000))
-    pass
 
 
 if __name__ == "__main__":

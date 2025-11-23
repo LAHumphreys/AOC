@@ -1,8 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
 from typing import Optional
-from itertools import chain, tee
-from copy import copy, deepcopy
 
 
 def quick_hash(string:str) -> int:
@@ -18,7 +16,7 @@ def part_one(tokens: list[str]) -> int:
     return sum(quick_hash(t) for t in tokens)
 
 def load_tokens(file_name: str) -> list[str]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         return input_file.read().split(",")
 
 
@@ -57,7 +55,8 @@ def apply_instruction(boxes: list[list[Lense]], instructions: list[Instruction])
                 lense = Lense(label=instruction.lense, focal_length=instruction.focal_length)
                 boxes[instruction.box_no].append(lense)
         else:
-            boxes[instruction.box_no] = [box for box in boxes[instruction.box_no] if box.label != instruction.lense]
+            boxes[instruction.box_no] = [box for box in boxes[instruction.box_no]
+                                          if box.label != instruction.lense]
 
 def parse_instruction(token: str) -> Instruction:
     if "-" in token:
@@ -93,7 +92,6 @@ def main():
     tokens = load_tokens("input/d15.txt")
     print(part_one(tokens))
     print(part_two(tokens))
-    pass
 
 
 if __name__ == "__main__":

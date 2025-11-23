@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-from tools.file_loader import load_string_groups
-from copy import deepcopy, copy
 from math import sqrt, floor, ceil
 
 
@@ -11,8 +9,9 @@ class Race:
 
 
 def load_races(file_name: str) -> list[Race]:
-    with open(file_name) as input_file:
-        times, distances = [line.split(":")[1].strip().strip("\n").split() for line in input_file.readlines()]
+    with open(file_name, encoding='utf-8') as input_file:
+        times, distances = [line.split(":")[1].strip().strip("\n").split()
+                            for line in input_file.readlines()]
         return [Race(race_time=int(time),
                      max_distance=int(distance)) for time, distance in zip(times, distances)]
 
@@ -44,7 +43,6 @@ def main():
     races = load_races("input/d06.txt")
     print(part_one(races))
     print(calculate_times(race_time=42899189, record_distance=308117012911467))
-    pass
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 def load_calibration(file_name) -> list[str]:
-    with open(file_name, "r") as input_file:
+    with open(file_name, "r", encoding='utf-8') as input_file:
         return [ln.replace("\n", "") for ln in input_file.readlines()]
 
 

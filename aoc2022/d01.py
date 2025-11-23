@@ -1,5 +1,6 @@
-from tools.file_loader import load_int_groups
 from dataclasses import dataclass
+
+from tools.file_loader import load_int_groups
 
 
 @dataclass
@@ -24,5 +25,5 @@ if __name__ == "__main__":
     def main():
         elves = load_elves("input/d01.txt")
         print(get_elves_with_most(elves, 1))
-        print(sum([elf.total for elf in get_elves_with_most(elves, 3)]))
+        print(sum(elf.total for elf in get_elves_with_most(elves, 3)))
     main()

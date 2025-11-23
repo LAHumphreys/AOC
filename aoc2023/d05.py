@@ -1,6 +1,7 @@
 from dataclasses import dataclass
-from tools.file_loader import load_string_groups
 from copy import deepcopy, copy
+
+from tools.file_loader import load_string_groups
 
 
 @dataclass
@@ -39,7 +40,7 @@ def parse_map_range(line: str) -> MapRange:
     destination, source, length = [int(token) for token in line.split()]
     return MapRange(source_start=source,
                     source_end=(source + length -1),
-                    offset=(destination-source))
+                    offset=destination-source)
 
 
 def parse_map_set(lines: [list[str]]) -> list[MapRange]:
@@ -125,12 +126,12 @@ def locate_seed(seed: int, instructions: Instructions) -> int:
     while source_id != "location":
         mapper = instructions.maps[source_id]
         valid_maps = []
-        for map in mapper.ranges:
-            if map.source_start <= value <= map.source_end:
-                valid_maps.append(map)
+        for map_range in mapper.ranges:
+            if map_range.source_start <= value <= map_range.source_end:
+                valid_maps.append(map_range)
         if len(valid_maps) > 1:
             raise ValueError
-        elif len(valid_maps) == 1:
+        if len(valid_maps) == 1:
             value += valid_maps[0].offset
         source_id = mapper.map_to
 
@@ -150,7 +151,6 @@ def main():
     print(part_one(instructions))
     instructions = parse_input("input/d05.txt")
     print(part_two(instructions))
-    pass
 
 
 if __name__ == "__main__":

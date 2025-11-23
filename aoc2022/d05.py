@@ -1,5 +1,6 @@
-from tools.file_loader import load_string_groups
 from dataclasses import dataclass
+
+from tools.file_loader import load_string_groups
 
 
 @dataclass
@@ -41,7 +42,7 @@ def move_stack(instruction: Instruction, stacks: SupplyStacks):
     # N is small enough we can just be explicit, even
     # if this is somewhat inefficient in terms of interacting
     # with the python data structure.
-    for i in range(instruction.count):
+    for _ in range(instruction.count):
         stacks.stacks[instruction.destination].append(
             stacks.stacks[instruction.source].pop()
         )

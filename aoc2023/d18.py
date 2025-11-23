@@ -1,7 +1,4 @@
-from enum import Enum
 from dataclasses import dataclass
-from typing import Optional
-from tools.file_loader import load_string_groups
 
 
 @dataclass
@@ -17,7 +14,7 @@ class Instruction:
 
 def load_instructions(file_name: str) -> list[Instruction]:
     instructions: list[Instruction] = []
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         for line in (ln.replace("\n", "") for ln in input_file.readlines()):
             direction, distance, _ = line.split()
             distance = int(distance)
@@ -83,9 +80,9 @@ def draw_trench(instructions: list[Instruction]) -> list[list[str]]:
     # Walk in from the right / bottom and knock out anything that's still out of bounds
     # clear the ? flag for anything in bounds
     num_edges_in_col = [0] * max_y
-    for y, row in reversed([pair for pair in enumerate(ground)]):
+    for y, row in reversed(list(enumerate(ground))):
         num_edges_in_row = 0
-        for x, token in reversed([pair for pair in enumerate(row)]):
+        for x, token in reversed(list(enumerate(row))):
             rhs_is_empty = x == max_x - 1 or ground[y][x+1] != "#"
             below_is_empty = y == max_y - 1 or ground[y+1][x] != "#"
             if token == "#" and rhs_is_empty:
@@ -110,7 +107,6 @@ def main():
     instructions = load_instructions("input/d18.txt")
     print(get_bounds(instructions))
     draw_trench(instructions)
-    pass
 
 
 if __name__ == "__main__":

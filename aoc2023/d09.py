@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from tools.file_loader import load_string_groups
 from itertools import pairwise
 from math import factorial, fabs
 
@@ -23,7 +22,7 @@ def apply_polynomial(number: float, terms: list[PolynomialTerm]):
 
 def calculate_top_order_term(series: list[int]) -> PolynomialTerm:
     diffs = [series]
-    while sum([fabs(x) for x in diffs[-1]]) / len(diffs) > 0.01:
+    while sum(fabs(x) for x in diffs[-1]) / len(diffs) > 0.01:
         diffs += [get_diffs(diffs[-1])]
     polynomial_order = len(diffs)-2
     return PolynomialTerm(
@@ -33,7 +32,7 @@ def calculate_top_order_term(series: list[int]) -> PolynomialTerm:
 
 def reduce_series(series: list[int], terms: list[PolynomialTerm]) -> list[int]:
     reduced_series = (x - apply_polynomial(n + 1, terms) for n, x in enumerate(series))
-    return [x for x in reduced_series]
+    return list(reduced_series)
 
 
 def get_series_calculator(series: list[int]) -> list[PolynomialTerm]:
@@ -62,7 +61,7 @@ def get_item(series: list[int], n: int = -1) -> int:
 
 def load_series(file_name: str) -> list[list[int]]:
     all_series = []
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         for line in (line.replace("\n", "") for line in input_file.readlines()):
             all_series.append([int(x) for x in line.split()])
     return all_series
@@ -70,14 +69,14 @@ def load_series(file_name: str) -> list[list[int]]:
 
 def part_one(all_series: list[list[int]]) -> int:
     total = 0
-    for n, series in enumerate(all_series):
+    for series in all_series:
         total += round(get_item(series, len(series) + 1))
     return total
 
 
 def part_two(all_series: list[list[int]]) -> int:
     total = 0
-    for n, series in enumerate(all_series):
+    for series in all_series:
         total += round(get_item(series, 0))
     return total
 
@@ -86,7 +85,6 @@ def main():
     all_series = load_series("input/d09.txt")
     print(part_one(all_series))
     print(part_two(all_series))
-    pass
 
 
 if __name__ == "__main__":

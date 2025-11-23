@@ -1,8 +1,6 @@
-from enum import Enum
 from dataclasses import dataclass
-from typing import Optional
-from itertools import chain, tee
 from copy import copy, deepcopy
+from itertools import chain
 
 @dataclass
 class SpringMap:
@@ -15,7 +13,7 @@ def expand_spring(short: SpringMap) -> SpringMap:
 
 
 def load_springs(file_name: str) -> list[SpringMap]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         result = []
         for line in (ln.replace("\n", "") for ln in input_file.readlines()):
             row, group_str = line.split()
@@ -53,7 +51,7 @@ def subtract_groups(full_groups: list[int], trail_groups: list[int]):
     remainder = copy(full_groups)
     if not trail_groups:
         return remainder
-    for i in range(len(trail_groups)-1):
+    for _ in range(len(trail_groups)-1):
         remainder.pop()
     if remainder[-1] == trail_groups[0]:
         remainder.pop()
@@ -65,20 +63,20 @@ def subtract_groups(full_groups: list[int], trail_groups: list[int]):
 TRIM_CACHE: dict[str, list[int]] = {}
 
 
-def trim_groups(slice: str, groups: list[int]) -> list[int]:
-    key = make_key(slice, groups)
+def trim_groups(string_slice: str, groups: list[int]) -> list[int]:
+    key = make_key(string_slice, groups)
     if key in TRIM_CACHE:
         return TRIM_CACHE[key]
     start_idx = 0
     valid = True
     remaining_groups = deepcopy(groups)
-    slice_len = len(slice)
-    if "#" in slice:
+    slice_len = len(string_slice)
+    if "#" in string_slice:
         while valid and remaining_groups:
             group = remaining_groups.pop(0)
             search_string = "#" * group
-            next_idx = slice.find(search_string, start_idx) + group
-            if next_idx < slice_len and slice[next_idx] != ".":
+            next_idx = string_slice.find(search_string, start_idx) + group
+            if next_idx < slice_len and string_slice[next_idx] != ".":
                 valid = False
             if next_idx < group or next_idx > slice_len:
                 valid = False
@@ -88,10 +86,10 @@ def trim_groups(slice: str, groups: list[int]) -> list[int]:
                 start_idx = next_idx
 
     if remaining_groups and (start_idx < slice_len -1 or len(remaining_groups) == len(groups)):
-        i = 0
-        while i < slice_len and slice[-1*(i+1)] == "#":
-            i += 1
-        remaining_groups[0] = remaining_groups[0] - i
+        trailing_i = 0
+        while trailing_i < slice_len and string_slice[-1*(trailing_i+1)] == "#":
+            trailing_i += 1
+        remaining_groups[0] = remaining_groups[0] - trailing_i
         if remaining_groups[0] <= 0:
             remaining_groups = remaining_groups[1:]
     TRIM_CACHE[key] = remaining_groups
@@ -180,13 +178,13 @@ def spring_possibilities(in_row: str, groups: list[int], cache: dict[str, list[s
             if next_idx < len(row) and row[next_idx] != ".":
                 valid = False
                 break
-            elif next_idx - group < 0:
+            if next_idx - group < 0:
                 valid = False
                 break
-            elif row[next_idx-group: next_idx] != "#"*group:
+            if row[next_idx-group: next_idx] != "#"*group:
                 valid = False
                 break
-            elif next_idx < group:
+            if next_idx < group:
                 valid = False
                 break
             start_idx = next_idx
@@ -202,7 +200,6 @@ def main():
     springs = load_springs("input/d12.txt")
     print(part_one(springs))
     print(part_two(springs))
-    pass
 
 
 if __name__ == "__main__":
