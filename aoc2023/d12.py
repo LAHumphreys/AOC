@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from copy import copy, deepcopy
 from itertools import chain
+from typing import Generator
+
 
 @dataclass
 class SpringMap:
@@ -104,6 +106,44 @@ def wrapped_possibilities(prefix: str, suffix: str, groups: list[int], cache: di
 COUNT_CACHE: dict[str, int] = {}
 
 
+def _validate_and_extend_spring_group(
+        slice_after: str, after_groups: list[int], before_groups: list[int], groups: list[int]
+) -> tuple[bool, str]:
+    """
+    Validate and extend slice_after when replacing '?' with '#'.
+    Returns (is_valid, extended_slice_after).
+    """
+    if not before_groups:
+        return False, slice_after
+
+    if not after_groups:
+        return True, slice_after
+
+    trail_group_len = after_groups[0]
+    marked_len = 1
+    prefix = ""
+    valid_split = True
+
+    # Check if we need to extend the group
+    if before_groups[-1] != groups[len(before_groups)-1]:
+        while valid_split and marked_len <= trail_group_len:
+            if (marked_len-1) >= len(slice_after) or slice_after[marked_len-1] == ".":
+                valid_split = False
+            else:
+                prefix += "#"
+            marked_len += 1
+
+    # Ensure proper termination of the group
+    if valid_split and marked_len <= len(slice_after):
+        if slice_after[marked_len-1] == "#":
+            valid_split = False
+        else:
+            prefix += "."
+
+    extended_slice = prefix + slice_after[len(prefix):]
+    return valid_split, extended_slice
+
+
 def count_possibilities(in_row: str, groups: list[int]) -> int:
     key = make_key(in_row, groups)
     if key in COUNT_CACHE:
@@ -111,50 +151,37 @@ def count_possibilities(in_row: str, groups: list[int]) -> int:
 
     count = 0
     first_unknown = in_row.find("?")
+
     if first_unknown >= 0:
         slice_before = in_row[:first_unknown]
         slice_after = in_row[first_unknown+1:]
-        for x in [".", "#"]:
-            before = slice_before + x
+
+        for replacement in [".", "#"]:
+            before = slice_before + replacement
             after_groups = trim_groups(before, groups)
             before_groups = subtract_groups(groups, after_groups)
             valid_split = True
-            if x == "#":
-                if not before_groups:
-                    valid_split = False
-                else:
-                    if after_groups:
-                        trail_group_len = after_groups[0]
-                        marked_len = 1
-                        prefix = ""
-                        if before_groups[-1] != groups[len(before_groups)-1]:
-                            while valid_split and marked_len <= trail_group_len:
-                                if (marked_len-1) >= len(slice_after) or slice_after[marked_len-1] == ".":
-                                    valid_split = False
-                                else:
-                                    prefix += "#"
-                                marked_len += 1
+            extended_slice_after = slice_after
 
-                        if marked_len <= len(slice_after):
-                            if slice_after[marked_len-1] == "#":
-                                valid_split = False
-                            else:
-                                prefix += "."
-                        slice_after = prefix + slice_after[len(prefix):]
+            if replacement == "#":
+                valid_split, extended_slice_after = _validate_and_extend_spring_group(
+                    slice_after, after_groups, before_groups, groups
+                )
 
             if valid_split:
-                rhs_count = count_possibilities(slice_after, after_groups)
-                # LHS couldbe invalid (so 1 or 0)
+                rhs_count = count_possibilities(extended_slice_after, after_groups)
                 lhs_count = count_possibilities(before, before_groups)
-                #print(f"Count: {in_row}: {groups} => (+{x}) {before}: {before_groups} + {slice_after}: {after_groups} ({lhs_count*rhs_count})")
-                count += lhs_count*rhs_count
+                count += lhs_count * rhs_count
     else:
         count = sum(1 for _ in spring_possibilities(in_row, groups))
+
     COUNT_CACHE[key] = count
     return count
 
 
-def spring_possibilities(in_row: str, groups: list[int], cache: dict[str, list[str]] = None) -> str:
+def spring_possibilities(
+        in_row: str, groups: list[int], cache: dict[str, list[str]] = None
+) -> Generator[str]:
     key = make_key(in_row, groups)
     first_unknown = in_row.find("?")
     if first_unknown >= 0:

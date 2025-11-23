@@ -31,7 +31,9 @@ class Input:
 
 
 def load_input(file_name: str) -> Input:
+    # pylint: disable=unbalanced-tuple-unpacking
     rules, parts = load_string_groups(file_name)
+    # pylint: enable=unbalanced-tuple-unpacking
     return Input(parts=[parse_part(part) for part in parts],
                  rules={rule.name: rule for rule in (parse_rule(rule) for rule in rules)})
 

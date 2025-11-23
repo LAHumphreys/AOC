@@ -32,7 +32,9 @@ def load_stacks(path: str) -> tuple[SupplyStacks, list[Instruction]]:
                            source=int(source),
                            destination=int(destination))
 
+    # pylint: disable=unbalanced-tuple-unpacking
     stack_lines, instructions = load_string_groups(path)
+    # pylint: enable=unbalanced-tuple-unpacking
     return SupplyStacks(stacks=get_stacks(stack_lines)), \
            list(map(get_instruction, instructions))
 
