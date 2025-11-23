@@ -12,6 +12,7 @@ class EnterFrom(Enum):
 
 Edge = EnterFrom
 
+
 class PipeEnclosureState(Enum):
     UNTESTED = "."
     MARKED = "+"
@@ -72,71 +73,51 @@ def traverse_pipe(enter_from: NextSegment, segment: PipeSegment) -> NextSegment:
 
 
 def apply_pipe_to_edges(edge: Edge, segment: PipeSegment, entered_from: EnterFrom) -> Edge:
-    if segment.code == "|" or segment.code == "-":
+    if segment.code in ('|', '-'):
         # No rotation performed
         return edge
-    elif segment.code == "L":
-        if entered_from == EnterFrom.TOP:
-            if edge == Edge.LEFT:
-                return Edge.BOTTOM
-            elif edge == Edge.RIGHT:
-                return Edge.TOP
-        elif entered_from == EnterFrom.RIGHT:
-            if edge == Edge.TOP:
-                return Edge.RIGHT
-            elif edge == Edge.BOTTOM:
-                return Edge.LEFT
-    elif segment.code == "J":
-        if entered_from == EnterFrom.TOP:
-            if edge == Edge.LEFT:
-                return Edge.TOP
-            elif edge == Edge.RIGHT:
-                return Edge.BOTTOM
-        elif entered_from == EnterFrom.LEFT:
-            if edge == Edge.TOP:
-                return Edge.LEFT
-            elif edge == Edge.BOTTOM:
-                return Edge.RIGHT
-    elif segment.code == "F":
-        if entered_from == EnterFrom.BOTTOM:
-            if edge == Edge.LEFT:
-                return Edge.TOP
-            elif edge == Edge.RIGHT:
-                return Edge.BOTTOM
-        elif entered_from == EnterFrom.RIGHT:
-            if edge == Edge.TOP:
-                return Edge.LEFT
-            elif edge == Edge.BOTTOM:
-                return Edge.RIGHT
-    elif segment.code == "7":
-        if entered_from == EnterFrom.BOTTOM:
-            if edge == Edge.LEFT:
-                return Edge.BOTTOM
-            elif edge == Edge.RIGHT:
-                return Edge.TOP
-        elif entered_from == EnterFrom.LEFT:
-            if edge == Edge.TOP:
-                return Edge.RIGHT
-            elif edge == Edge.BOTTOM:
-                return Edge.LEFT
+
+    # Lookup table: (segment_code, entered_from, edge) -> new_edge
+    transformations = {
+        ("L", EnterFrom.TOP, Edge.LEFT): Edge.BOTTOM,
+        ("L", EnterFrom.TOP, Edge.RIGHT): Edge.TOP,
+        ("L", EnterFrom.RIGHT, Edge.TOP): Edge.RIGHT,
+        ("L", EnterFrom.RIGHT, Edge.BOTTOM): Edge.LEFT,
+        ("J", EnterFrom.TOP, Edge.LEFT): Edge.TOP,
+        ("J", EnterFrom.TOP, Edge.RIGHT): Edge.BOTTOM,
+        ("J", EnterFrom.LEFT, Edge.TOP): Edge.LEFT,
+        ("J", EnterFrom.LEFT, Edge.BOTTOM): Edge.RIGHT,
+        ("F", EnterFrom.BOTTOM, Edge.LEFT): Edge.TOP,
+        ("F", EnterFrom.BOTTOM, Edge.RIGHT): Edge.BOTTOM,
+        ("F", EnterFrom.RIGHT, Edge.TOP): Edge.LEFT,
+        ("F", EnterFrom.RIGHT, Edge.BOTTOM): Edge.RIGHT,
+        ("7", EnterFrom.BOTTOM, Edge.LEFT): Edge.BOTTOM,
+        ("7", EnterFrom.BOTTOM, Edge.RIGHT): Edge.TOP,
+        ("7", EnterFrom.LEFT, Edge.TOP): Edge.RIGHT,
+        ("7", EnterFrom.LEFT, Edge.BOTTOM): Edge.LEFT,
+    }
+
+    result = transformations.get((segment.code, entered_from, edge))
+    if result is not None:
+        return result
     raise ValueError
 
 
 def determine_start(grid: list[list[PipeSegment]], start_x, start_y) -> PipeSegment:
     max_x = len(grid[0]) - 1
     max_y = len(grid) - 1
-    has_right_exit = start_x < max_x and\
-        grid[start_y][start_x + 1] and \
-        EnterFrom.LEFT in grid[start_y][start_x + 1].next_segment
+    has_right_exit = start_x < max_x and \
+                     grid[start_y][start_x + 1] and \
+                     EnterFrom.LEFT in grid[start_y][start_x + 1].next_segment
     has_left_exit = start_x > 0 and \
-        grid[start_y][start_x + -1] and \
-        EnterFrom.RIGHT in grid[start_y][start_x + -1].next_segment
+                    grid[start_y][start_x + -1] and \
+                    EnterFrom.RIGHT in grid[start_y][start_x + -1].next_segment
     has_top_exit = start_y > 0 and \
-        grid[start_y - 1][start_x] and \
-        EnterFrom.BOTTOM in grid[start_y - 1][start_x].next_segment
+                   grid[start_y - 1][start_x] and \
+                   EnterFrom.BOTTOM in grid[start_y - 1][start_x].next_segment
     has_bottom_exit = start_y < max_y and \
-        grid[start_y + 1][start_x] and \
-        EnterFrom.TOP in grid[start_y + 1][start_x].next_segment
+                      grid[start_y + 1][start_x] and \
+                      EnterFrom.TOP in grid[start_y + 1][start_x].next_segment
 
     if has_bottom_exit and has_right_exit:
         return make_segment("F")
@@ -197,7 +178,7 @@ def load_grid(file_name: str) -> list[list[PipeSegment]]:
 
 def part_two(grid: InitialGrid) -> int:
     enclosure = draw_loop(grid)
-    #mark_edges(enclosure)
+    # mark_edges(enclosure)
     mark_outer_edges(enclosure, grid)
     debug_print(enclosure)
     resolve_marked_exposures(enclosure)
@@ -241,27 +222,39 @@ def debug_print(cells: list[list[PipeEnclosureState]]):
         print("".join([x.value for x in row]))
 
 
+def check_if_requires_vertical_propagation(enclosure: list[list[PipeEnclosureState]],
+                                           check_x: int,
+                                           check_y: int):
+    vertical_states = [PipeEnclosureState.HORIZONTAL,
+                       PipeEnclosureState.MARKED,
+                       PipeEnclosureState.EXPOSED]
+    if check_y > 0 and enclosure[check_y - 1][check_x] not in vertical_states:
+        return True
+
+    max_y = len(enclosure) - 1
+    if check_y < max_y and enclosure[check_y + 1][check_x] not in vertical_states:
+        return True
+
+    return False
+
+
+def check_if_requires_horizontal_propagation(enclosure: list[list[PipeEnclosureState]],
+                                             check_x: int,
+                                             check_y: int):
+    horizontal_states = [PipeEnclosureState.VERTICAL,
+                         PipeEnclosureState.MARKED,
+                         PipeEnclosureState.EXPOSED]
+    if check_x > 0 and enclosure[check_y][check_x - 1] not in horizontal_states:
+        return True
+    max_x = len(enclosure[check_y]) - 1
+    if check_x < max_x and enclosure[check_y][check_x + 1] not in horizontal_states:
+        return True
+    return False
+
 def expose_cell(enclosure: list[list[PipeEnclosureState]], x: int, y: int):
     enclosure[y][x] = PipeEnclosureState.EXPOSED
     max_x = len(enclosure[0]) - 1
     max_y = len(enclosure) - 1
-    mark_x, mark_y = x, y
-    vertical_states = [PipeEnclosureState.HORIZONTAL, PipeEnclosureState.MARKED, PipeEnclosureState.EXPOSED]
-    horizontal_states = [PipeEnclosureState.VERTICAL, PipeEnclosureState.MARKED, PipeEnclosureState.EXPOSED]
-
-    def check_if_requires_vertical_propagation(check_x: int, check_y: int):
-        if check_y > 0 and enclosure[check_y - 1][check_x] not in vertical_states:
-            return True
-        if check_y < max_y and enclosure[check_y + 1][check_x] not in vertical_states:
-            return True
-        return False
-
-    def check_if_requires_horizontal_propagation(check_x: int, check_y: int):
-        if check_x > 0 and enclosure[check_y][check_x - 1] not in horizontal_states:
-            return True
-        if check_x < max_x and enclosure[check_y][check_x + 1] not in horizontal_states:
-            return True
-        return False
 
     closed_lower_gap_joints = [PipeEnclosureState.JOINT_F, PipeEnclosureState.JOINT_7]
     closed_upper_gap_joints = [PipeEnclosureState.JOINT_J, PipeEnclosureState.JOINT_L]
@@ -275,7 +268,6 @@ def expose_cell(enclosure: list[list[PipeEnclosureState]], x: int, y: int):
             lower = False
         elif enclosure[check_y][check_x] in closed_upper_gap_joints:
             upper = False
-
         return lower, upper
 
     def close_vertical_gaps(check_x: int, check_y: int, left: bool, right: bool):
@@ -285,51 +277,43 @@ def expose_cell(enclosure: list[list[PipeEnclosureState]], x: int, y: int):
             left = False
         elif enclosure[check_y][check_x] in closed_right_gap_joints:
             right = False
-
         return left, right
 
-    lower_gap = upper_gap = True
-    while mark_x > 0 and (lower_gap or upper_gap):
-        mark_x -= 1
-        lower_gap, upper_gap = close_horizontal_gaps(mark_x, mark_y, lower_gap, upper_gap)
-        if enclosure[y][mark_x] == PipeEnclosureState.UNTESTED:
-            if check_if_requires_vertical_propagation(mark_x, y):
-                enclosure[y][mark_x] = PipeEnclosureState.MARKED
-            else:
-                enclosure[y][mark_x] = PipeEnclosureState.EXPOSED
+    def propagate_horizontal(start_x: int, direction: int):
+        """Propagate exposure horizontally (left/right)."""
+        mark_x = start_x
+        lower_gap = upper_gap = True
+        can_continue = (direction < 0 < mark_x) or (direction > 0 and mark_x < max_x)
+        while can_continue and (lower_gap or upper_gap):
+            mark_x += direction
+            lower_gap, upper_gap = close_horizontal_gaps(mark_x, y, lower_gap, upper_gap)
+            if enclosure[y][mark_x] == PipeEnclosureState.UNTESTED:
+                if check_if_requires_vertical_propagation(enclosure, mark_x, y):
+                    enclosure[y][mark_x] = PipeEnclosureState.MARKED
+                else:
+                    enclosure[y][mark_x] = PipeEnclosureState.EXPOSED
+            can_continue = (direction < 0 < mark_x) or (direction > 0 and mark_x < max_x)
 
-    mark_x, mark_y = x, y
-    lower_gap = upper_gap = True
-    while mark_x < max_x and (lower_gap or upper_gap):
-        mark_x += 1
-        lower_gap, upper_gap = close_horizontal_gaps(mark_x, mark_y, lower_gap, upper_gap)
-        if enclosure[y][mark_x] == PipeEnclosureState.UNTESTED:
-            if check_if_requires_vertical_propagation(mark_x, y):
-                enclosure[y][mark_x] = PipeEnclosureState.MARKED
-            else:
-                enclosure[y][mark_x] = PipeEnclosureState.EXPOSED
+    def propagate_vertical(start_y: int, direction: int):
+        """Propagate exposure vertically (up/down)."""
+        mark_y = start_y
+        left_gap = right_gap = True
+        can_continue = (direction < 0 < mark_y) or (direction > 0 and mark_y < max_y)
+        while can_continue and (left_gap or right_gap):
+            mark_y += direction
+            left_gap, right_gap = close_vertical_gaps(x, mark_y, left_gap, right_gap)
+            if enclosure[mark_y][x] == PipeEnclosureState.UNTESTED:
+                if check_if_requires_horizontal_propagation(enclosure, x, mark_y):
+                    enclosure[mark_y][x] = PipeEnclosureState.MARKED
+                else:
+                    enclosure[mark_y][x] = PipeEnclosureState.EXPOSED
+            can_continue = (direction < 0 < mark_y) or (direction > 0 and mark_y < max_y)
 
-    mark_x, mark_y = x, y
-    left_gap = right_gap = True
-    while mark_y > 0 and (left_gap or right_gap):
-        mark_y -= 1
-        left_gap, right_gap = close_vertical_gaps(x, mark_y, left_gap, right_gap)
-        if enclosure[mark_y][x] == PipeEnclosureState.UNTESTED:
-            if check_if_requires_horizontal_propagation(x, mark_y):
-                enclosure[mark_y][x] = PipeEnclosureState.MARKED
-            else:
-                enclosure[mark_y][x] = PipeEnclosureState.EXPOSED
-
-    mark_y, mark_y = x, y
-    left_gap = right_gap = True
-    while mark_y < max_y and (left_gap or right_gap):
-        mark_y += 1
-        left_gap, right_gap = close_vertical_gaps(x, mark_y, left_gap, right_gap)
-        if enclosure[mark_y][x] == PipeEnclosureState.UNTESTED:
-            if check_if_requires_horizontal_propagation(x, mark_y):
-                enclosure[mark_y][x] = PipeEnclosureState.MARKED
-            else:
-                enclosure[mark_y][x] = PipeEnclosureState.EXPOSED
+    # Propagate in all four directions
+    propagate_horizontal(x, -1)  # Left
+    propagate_horizontal(x, 1)  # Right
+    propagate_vertical(y, -1)  # Up
+    propagate_vertical(y, 1)  # Down
 
 
 def load_enclosure(file_name: str) -> list[list[PipeEnclosureState]]:
@@ -346,10 +330,11 @@ def draw_loop(grid: InitialGrid) -> list[list[PipeEnclosureState]]:
         enclosure += [[PipeEnclosureState.UNTESTED for _ in row]]
 
     start_pos = grid.pipes[grid.start_y][grid.start_x]
-    route = [x for x in start_pos.next_segment.keys()][0]
+    route = list(start_pos.next_segment.keys())[0]
     start_segment = NextSegment(x=grid.start_x, y=grid.start_y, enter_from=route)
     current_location = traverse_pipe(start_segment, start_pos)
-    enclosure[grid.start_y][grid.start_x] = PipeEnclosureState(grid.pipes[grid.start_y][grid.start_x].code)
+    enclosure[grid.start_y][grid.start_x] = PipeEnclosureState(
+        grid.pipes[grid.start_y][grid.start_x].code)
     enclosure[current_location.y][current_location.x] = \
         PipeEnclosureState(grid.pipes[current_location.y][current_location.x].code)
     while current_location.x != grid.start_x or current_location.y != grid.start_y:
@@ -362,19 +347,20 @@ def draw_loop(grid: InitialGrid) -> list[list[PipeEnclosureState]]:
 
 def mark_edges(enclosure: list[list[PipeEnclosureState]]):
     max_x = len(enclosure[0]) - 1
-    exposed_row = [PipeEnclosureState.MARKED] * (max_x +3)
+    exposed_row = [PipeEnclosureState.MARKED] * (max_x + 3)
     for row in enclosure:
         row.insert(0, PipeEnclosureState.MARKED)
         row.append(PipeEnclosureState.MARKED)
     enclosure.insert(0, exposed_row)
     enclosure.append(exposed_row)
 
+
 def find_left_edge(enclosure: list[list[PipeEnclosureState]]) -> tuple[int, int]:
-    for y in range(len(enclosure)):
-        for x in range(len(enclosure[0])):
-            if enclosure[y][x] == PipeEnclosureState.VERTICAL:
+    for y, row in enumerate(enclosure):
+        for x, cell in enumerate(row):
+            if cell == PipeEnclosureState.VERTICAL:
                 return x, y
-            elif enclosure[y][x] != PipeEnclosureState.UNTESTED:
+            if cell != PipeEnclosureState.UNTESTED:
                 break
     raise ValueError
 
@@ -386,16 +372,20 @@ def mark_outer_edges(enclosure: list[list[PipeEnclosureState]], grid: InitialGri
 
     def mark_current_edge():
         if edge == Edge.TOP and current_location.y > 0 and \
-                enclosure[current_location.y-1][current_location.x] == PipeEnclosureState.UNTESTED:
+                enclosure[current_location.y - 1][
+                    current_location.x] == PipeEnclosureState.UNTESTED:
             enclosure[current_location.y - 1][current_location.x] = PipeEnclosureState.MARKED
         if edge == Edge.BOTTOM and current_location.y < max_y and \
-                enclosure[current_location.y + 1][current_location.x] == PipeEnclosureState.UNTESTED:
+                enclosure[current_location.y + 1][
+                    current_location.x] == PipeEnclosureState.UNTESTED:
             enclosure[current_location.y + 1][current_location.x] = PipeEnclosureState.MARKED
         if edge == Edge.LEFT and current_location.x > 0 and \
-                enclosure[current_location.y][current_location.x-1] == PipeEnclosureState.UNTESTED:
-            enclosure[current_location.y][current_location.x-1] = PipeEnclosureState.MARKED
+                enclosure[current_location.y][
+                    current_location.x - 1] == PipeEnclosureState.UNTESTED:
+            enclosure[current_location.y][current_location.x - 1] = PipeEnclosureState.MARKED
         if edge == Edge.RIGHT and current_location.x < max_x and \
-                enclosure[current_location.y][current_location.x + 1] == PipeEnclosureState.UNTESTED:
+                enclosure[current_location.y][
+                    current_location.x + 1] == PipeEnclosureState.UNTESTED:
             enclosure[current_location.y][current_location.x + 1] = PipeEnclosureState.MARKED
 
     edge = Edge.LEFT
@@ -413,12 +403,12 @@ def mark_outer_edges(enclosure: list[list[PipeEnclosureState]], grid: InitialGri
         mark_current_edge()
 
 
-
 def count_enclosed_area(enclosure: list[list[PipeEnclosureState]]) -> int:
     total = 0
-    for row in range(len(enclosure)):
-        for col in range(len(enclosure[0])):
-            if enclosure[row][col] == PipeEnclosureState.UNTESTED:
+    total = 0
+    for _, row in enumerate(enclosure):
+        for _, cell in enumerate(row):
+            if cell == PipeEnclosureState.UNTESTED:
                 total += 1
     return total
 

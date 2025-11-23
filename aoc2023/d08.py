@@ -17,7 +17,9 @@ class Map:
 
 
 def load_map(file_name:str) -> Map:
+    # pylint: disable=unbalanced-tuple-unpacking
     directions, nodes = load_string_groups(file_name)
+    # pylint: enable=unbalanced-tuple-unpacking
     node_map = {}
     for node_str in nodes:
         node_id, neighbour_str = node_str.split(" = ")
