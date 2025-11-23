@@ -81,10 +81,8 @@ def part_two(grid: Dict[Point, int], folds: List[Point]) -> int:
     max_x = 0
     max_y = 0
     for x, y in grid:
-        if x > max_x:
-            max_x = x
-        if y > max_y:
-            max_y = y
+        max_x = max(max_x, x)
+        max_y = max(max_y, y)
     output = ""
     for y in range(max_y+1):
         output += "\n"

@@ -75,8 +75,7 @@ def find_max_thrust(code):
     max_thrust = -1
     for phase in generate_permutations([0, 1, 2, 3, 4], 5):
         thrust = thruster.compute_thrust(phase)
-        if thrust > max_thrust:
-            max_thrust = thrust
+        max_thrust = max(thrust, max_thrust)
 
     return max_thrust
 
@@ -86,8 +85,7 @@ def find_max_feedback_thrust(code):
     max_thrust = -1
     for phase in generate_permutations([5, 6, 7, 8, 9], 5):
         thrust = thruster.compute_thrust(phase)
-        if thrust > max_thrust:
-            max_thrust = thrust
+        max_thrust = max(thrust, max_thrust)
 
     return max_thrust
 
