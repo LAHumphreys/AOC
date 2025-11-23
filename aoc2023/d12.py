@@ -11,7 +11,7 @@ class SpringMap:
 
 
 def expand_spring(short: SpringMap) -> SpringMap:
-    return SpringMap(row=((short.row+"?")*5)[:-1], groups=short.groups*5)
+    return SpringMap(row=((short.row + "?") * 5)[:-1], groups=short.groups * 5)
 
 
 def load_springs(file_name: str) -> list[SpringMap]:
@@ -53,7 +53,7 @@ def subtract_groups(full_groups: list[int], trail_groups: list[int]):
     remainder = copy(full_groups)
     if not trail_groups:
         return remainder
-    for _ in range(len(trail_groups)-1):
+    for _ in range(len(trail_groups) - 1):
         remainder.pop()
     if remainder[-1] == trail_groups[0]:
         remainder.pop()
@@ -87,9 +87,9 @@ def trim_groups(string_slice: str, groups: list[int]) -> list[int]:
             else:
                 start_idx = next_idx
 
-    if remaining_groups and (start_idx < slice_len -1 or len(remaining_groups) == len(groups)):
+    if remaining_groups and (start_idx < slice_len - 1 or len(remaining_groups) == len(groups)):
         trailing_i = 0
-        while trailing_i < slice_len and string_slice[-1*(trailing_i+1)] == "#":
+        while trailing_i < slice_len and string_slice[-1 * (trailing_i + 1)] == "#":
             trailing_i += 1
         remaining_groups[0] = remaining_groups[0] - trailing_i
         if remaining_groups[0] <= 0:
@@ -125,9 +125,9 @@ def _validate_and_extend_spring_group(
     valid_split = True
 
     # Check if we need to extend the group
-    if before_groups[-1] != groups[len(before_groups)-1]:
+    if before_groups[-1] != groups[len(before_groups) - 1]:
         while valid_split and marked_len <= trail_group_len:
-            if (marked_len-1) >= len(slice_after) or slice_after[marked_len-1] == ".":
+            if (marked_len - 1) >= len(slice_after) or slice_after[marked_len - 1] == ".":
                 valid_split = False
             else:
                 prefix += "#"
@@ -135,7 +135,7 @@ def _validate_and_extend_spring_group(
 
     # Ensure proper termination of the group
     if valid_split and marked_len <= len(slice_after):
-        if slice_after[marked_len-1] == "#":
+        if slice_after[marked_len - 1] == "#":
             valid_split = False
         else:
             prefix += "."
@@ -154,7 +154,7 @@ def count_possibilities(in_row: str, groups: list[int]) -> int:
 
     if first_unknown >= 0:
         slice_before = in_row[:first_unknown]
-        slice_after = in_row[first_unknown+1:]
+        slice_after = in_row[first_unknown + 1:]
 
         for replacement in [".", "#"]:
             before = slice_before + replacement
@@ -179,45 +179,51 @@ def count_possibilities(in_row: str, groups: list[int]) -> int:
     return count
 
 
+def _validate_row_against_groups(row: str, groups: list[int]) -> bool:
+    """Validate that a row matches the expected group pattern."""
+    start_idx = 0
+    for group in groups:
+        next_idx = row.find("#", start_idx) + group
+        # Check for invalid conditions
+        if next_idx - group < 0:
+            return False
+        if next_idx < group:
+            return False
+        if row[next_idx - group: next_idx] != "#" * group:
+            return False
+        if next_idx < len(row) and row[next_idx] != ".":
+            return False
+        start_idx = next_idx
+
+    # Ensure no remaining springs after all groups
+    return "#" not in row[start_idx:]
+
+
+def _generate_candidate_rows(in_row: str, groups: list[int], cache: dict[str, list[str]]):
+    """Generate candidate rows by replacing unknowns."""
+    first_unknown = in_row.find("?")
+    if first_unknown >= 0:
+        slice_before = in_row[:first_unknown]
+        slice_after = in_row[first_unknown + 1:]
+        row_gens = [
+            wrapped_possibilities(
+                slice_before + x, slice_after, trim_groups(slice_before + x, groups), cache
+            )
+            for x in [".", "#"]
+        ]
+        return chain(*row_gens)
+    return [in_row]
+
+
 def spring_possibilities(
         in_row: str, groups: list[int], cache: dict[str, list[str]] = None
 ) -> Generator[str]:
     key = make_key(in_row, groups)
-    first_unknown = in_row.find("?")
-    if first_unknown >= 0:
-        slice_before = in_row[:first_unknown]
-        slice_after = in_row[first_unknown+1:]
-        row_gens = []
-        for x in [".", "#"]:
-            before = slice_before + x
-            after_groups = trim_groups(before, groups)
-            row_gens += [wrapped_possibilities(before, slice_after, after_groups, cache)]
-        rows = chain(*row_gens)
-    else:
-        rows = [in_row]
+    rows = _generate_candidate_rows(in_row, groups, cache)
 
     valid_rows = 0
     for row in rows:
-        start_idx = 0
-        valid = True
-        for group in groups:
-            next_idx = row.find("#", start_idx) + group
-            if next_idx < len(row) and row[next_idx] != ".":
-                valid = False
-                break
-            if next_idx - group < 0:
-                valid = False
-                break
-            if row[next_idx-group: next_idx] != "#"*group:
-                valid = False
-                break
-            if next_idx < group:
-                valid = False
-                break
-            start_idx = next_idx
-        if "#" in row[start_idx:]:
-            valid = False
-        if valid:
+        if _validate_row_against_groups(row, groups):
             valid_rows += 1
             yield row
     COUNT_CACHE[key] = valid_rows
