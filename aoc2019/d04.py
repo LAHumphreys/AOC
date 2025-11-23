@@ -18,15 +18,13 @@ def valid_value(val, req_run=None):
             elif value < last:
                 return False
             else:
-                if run > longest_run:
-                    longest_run = run
+                longest_run = max(run, longest_run)
                 if run == req_run:
                     got_required = True
                 run = 1
             last = value
 
-        if run > longest_run:
-            longest_run = run
+        longest_run = max(run, longest_run)
 
         if run == req_run:
             got_required = True

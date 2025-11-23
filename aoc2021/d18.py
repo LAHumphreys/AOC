@@ -220,8 +220,7 @@ def largest_magnitude(numbers: List[SnailFishNode]) -> int:
         for rhs in numbers:
             if lhs is not rhs:
                 mag = magnitude(sn_sum([deepcopy(lhs), deepcopy(rhs)]))
-                if mag > largest:
-                    largest = mag
+                largest = max(largest, mag)
     return largest
 
 

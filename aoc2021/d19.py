@@ -208,8 +208,7 @@ def get_greatest_distance(frames: List[Frame]) -> int:
             distance = abs(frame.x - other_frame.x) +\
                        abs(frame.y - other_frame.y) +\
                        abs(frame.z - other_frame.z)
-            if distance > greatest:
-                greatest = distance
+            greatest = max(greatest, distance)
     return greatest
 
 

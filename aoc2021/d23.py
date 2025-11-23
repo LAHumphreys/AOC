@@ -281,6 +281,7 @@ def get_valid_corridor_exits(cave: Cave) -> List[Cave]:
 def get_valid_room_exits(cave: Cave, room: Room) -> List[Cave]:
     caves = []
     amphipod = None
+    spaces_moved = 0
     new_room = Room(
         type=room.type,
         join_index=room.join_index,
