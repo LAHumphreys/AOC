@@ -13,7 +13,7 @@ Group = tuple[RuckSack, RuckSack, RuckSack]
 
 def load_rucksacks(path: str) -> list[RuckSack]:
     packs = []
-    with open(path, "r") as f:
+    with open(path, "r", encoding='utf-8') as f:
         for line in [line.replace("\n", "") for line in f.readlines()]:
             pocket_size = len(line) // 2
             packs.append(RuckSack(
@@ -49,8 +49,7 @@ def get_badge(packs: Group) -> int:
 def score(item: str) -> int:
     if item < 'a':
         return ord(item) - 38
-    else:
-        return ord(item) - 96
+    return ord(item) - 96
 
 
 def get_repeat(pack: RuckSack) -> int:
@@ -62,7 +61,7 @@ def get_repeat(pack: RuckSack) -> int:
     while True:
         if first == last:
             return first
-        elif first < last:
+        if first < last:
             first = next(first_iter)
         else:
             last = next(last_iter)

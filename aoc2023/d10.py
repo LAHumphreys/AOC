@@ -175,7 +175,7 @@ class InitialGrid:
 
 
 def load_grid_with_start(file_name: str) -> InitialGrid:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         grid = []
         lines = [line.replace("\n", "") for line in input_file.readlines()]
         for line in lines:
@@ -333,7 +333,7 @@ def expose_cell(enclosure: list[list[PipeEnclosureState]], x: int, y: int):
 
 
 def load_enclosure(file_name: str) -> list[list[PipeEnclosureState]]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         grid = []
         for line in (line.replace("\n", "") for line in input_file.readlines()):
             grid += [[PipeEnclosureState(c) for c in line]]
@@ -427,7 +427,6 @@ def main():
     grid = load_grid_with_start("input/d10.txt")
     print(part_one(grid))
     print(part_two(grid))
-    pass
 
 
 if __name__ == "__main__":

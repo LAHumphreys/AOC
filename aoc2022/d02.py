@@ -43,13 +43,13 @@ code_to_win = {
 
 
 def load_rounds(path: str) -> list[Round]:
-    with open(path, "r") as f:
+    with open(path, "r", encoding='utf-8') as f:
         return [Round(opponent=code_to_rps[line[0]],
                       you=code_to_rps[line[2]]) for line in f.readlines()]
 
 
 def load_rounds_2(path: str) -> list[Round2]:
-    with open(path, "r") as f:
+    with open(path, "r", encoding='utf-8') as f:
         return [Round2(opponent=code_to_rps[line[0]],
                        result=code_to_win[line[2]]) for line in f.readlines()]
 
@@ -57,25 +57,21 @@ def load_rounds_2(path: str) -> list[Round2]:
 def play(you: RPS, opponent: RPS) -> int:
     if you == opponent:
         return 3 + you
-    elif (you % 3) + 1 == opponent:
+    if (you % 3) + 1 == opponent:
         return you
-    else:
-        return 6 + you
+    return 6 + you
 
 
 def play_2(opponent: RPS, result: Result) -> int:
     if result == result.DRAW:
         return 3 + opponent
-    elif result == result.LOSE:
+    if result == result.LOSE:
         if opponent == RPS.ROCK:
             return 3
-        else:
-            return opponent - 1
-    else:
-        if opponent == RPS.SCISSORS:
-            return 7
-        else:
-            return 6 + opponent + 1
+        return opponent - 1
+    if opponent == RPS.SCISSORS:
+        return 7
+    return 6 + opponent + 1
 
 
 def play_rounds(games: list[Round]) -> int:

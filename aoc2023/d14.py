@@ -1,12 +1,7 @@
-from enum import Enum
-from dataclasses import dataclass
-from typing import Optional
-from itertools import chain, tee
-from copy import copy, deepcopy
 
 
 def load_array(file_name: str) -> list[str]:
-    with open(file_name) as input_file:
+    with open(file_name, encoding='utf-8') as input_file:
         return [ln.replace("\n", "") for ln in input_file.readlines()]
 
 
@@ -89,10 +84,7 @@ def check_loop_to(stops: list[int], target: int) -> bool:
         if diff_1 != diff_2 or diff_1 != diff_3:
             return False
         remainder = target - stops[-1]
-        if remainder % diff_1 == 0:
-            return True
-        else:
-            return False
+        return remainder % diff_1 == 0
     return False
 
 def do_cycle(array: list[str]) -> list[str]:
@@ -124,7 +116,6 @@ def main():
     array = load_array("input/d14.txt")
     print(part_one(array))
     print(part_two(array))
-    pass
 
 
 if __name__ == "__main__":

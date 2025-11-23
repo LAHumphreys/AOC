@@ -22,7 +22,7 @@ def parse_card(line: str) -> Card:
 
 
 def load_cards(filename: str) -> list[Card]:
-    with open(filename) as input_file:
+    with open(filename, encoding='utf-8') as input_file:
         lines = (line.replace("\n", "") for line in input_file.readlines())
         return [parse_card(line) for line in lines]
 
