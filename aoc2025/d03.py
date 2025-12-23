@@ -14,7 +14,10 @@ def unsafe_joltage_from_bank(bank: str) -> int:
     joltage_string = ""
     while digits_remaining > 0:
         digits_remaining -= 1
-        index, next_digit = max(enumerate(bank[first_idx:bank_len-digits_remaining]), key=lambda x: x[1])
+        index, next_digit = max(
+            enumerate(bank[first_idx:bank_len - digits_remaining]),
+            key=lambda x: x[1]
+        )
         joltage_string += next_digit
         first_idx += index + 1
     return int(joltage_string)
