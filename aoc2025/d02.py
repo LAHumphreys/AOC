@@ -1,9 +1,10 @@
-from tools.string_operations import subdivide
 from typing import Optional
+from tools.string_operations import subdivide
+
 
 def load_sample(file: str) -> list[tuple[str, str]]:
     data = []
-    with open(file, "r") as f:
+    with open(file, "r", encoding="utf-8") as f:
         pairs = [line.strip() for line in f.readlines()][0].split(",")
         for pair in pairs:
             start, end = pair.split("-")
