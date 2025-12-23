@@ -22,10 +22,9 @@ def count_rows(the_map: list[str]) -> list[list[int]]:
 def convert_map_point(point: str):
     if point == "@":
         return 1
-    elif point == ".":
+    if point == ".":
         return 0
-    else:
-        raise ValueError(f"Invalid map point: {point}")
+    raise ValueError(f"Invalid map point: {point}")
 
 def count_row(row: str) -> list[int]:
     index = -1
