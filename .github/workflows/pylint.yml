@@ -28,4 +28,4 @@ jobs:
     - name: Analysing problems with pylint (no docs required)
       run: |
         pylint --disable=C0116,C0115,C0114,C0209 aoc2019 aoc2020
-        pylint --good-names=x,y,z,i,j --disable=C0116,C0115,C0114 aoc2021 aoc2022 aoc2023
+        pylint --good-names=x,y,z,i,j --disable=C0116,C0115,C0114 aoc2021 aoc2022 aoc2023 aoc2025

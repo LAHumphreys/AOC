@@ -1,5 +1,5 @@
 def load_sample(file: str) -> list[str]:
-    with open(file, "r") as f:
+    with open(file, "r", encoding="utf-8") as f:
         return f.readlines()
 
 def part1(lines) -> int:
@@ -16,10 +16,9 @@ def apply_rotation(value: int, rotation: str):
     size = int(rotation[1:])
     if direction == 'R':
         return (value + size) % 100
-    elif direction == 'L':
+    if direction == 'L':
         return (value - size) % 100
-    else:
-        raise ValueError(f"Invalid rotation: {rotation}")
+    raise ValueError(f"Invalid rotation: {rotation}")
 
 
 def part2(lines):
@@ -27,7 +26,7 @@ def part2(lines):
     value = 50
     for line in lines:
         line = line.strip()
-        rotator = int(line[1:]) # TODO: Fix rotation > 100
+        rotator = int(line[1:])
         full_rotations = int(rotator / 100)
         count += full_rotations
         direction = line[0]
@@ -49,7 +48,7 @@ def part2(lines):
 
 
 def main():
-    with open("input/d01.txt", "r") as f:
+    with open("input/d01.txt", "r", encoding="utf-8") as f:
         lines = f.readlines()
     print(part1(lines))
     print(part2(lines))
