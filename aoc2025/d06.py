@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from itertools import product
 
 
 @dataclass
@@ -9,7 +8,6 @@ class Problem:
     operation: str
 
 def solve_part_one(problem: Problem) -> int:
-    result = 0
     if problem.operation == "*":
         result = 1
         for x in problem.inputs:
@@ -24,8 +22,8 @@ def solve_part_one(problem: Problem) -> int:
 def solve_part_two(problem: Problem) -> int:
     converted_inputs: list[str] = ["" for _ in problem.inputs]
     reversed_inputs = [x[::-1] for x in problem.raw_inputs]
-    for input in reversed_inputs:
-        for digit_index, digit in enumerate(input):
+    for input_str in reversed_inputs:
+        for digit_index, digit in enumerate(input_str):
             if digit != " ":
                 converted_inputs[digit_index] += digit
     print(f"Converted Problem: {converted_inputs}  {problem.raw_inputs}")
@@ -40,7 +38,7 @@ def load_sample(file: str) -> list[Problem]:
         lines: list[str] = [line.strip("\n") for line in f.readlines()]
         num_starts = []
         for index, char in enumerate(lines[-1]):
-            if char != "" and char != ' ':
+            if char not in ('', ' '):
                 problems.append(Problem(inputs=[], operation=char, raw_inputs=[]))
                 num_starts.append(index)
         for line in lines[:-1]:
@@ -48,15 +46,15 @@ def load_sample(file: str) -> list[Problem]:
             problem_index = 0
             this_index = 0
             for next_index in num_starts[1:]:
-                slice: str = line[this_index:next_index-1]
-                print(f"slice {slice} from {this_index} to {next_index} using {line}")
-                problems[problem_index].inputs.append(int(slice))
-                problems[problem_index].raw_inputs.append(slice)
+                input_slice: str = line[this_index:next_index - 1]
+                print(f"slice {input_slice} from {this_index} to {next_index} using {line}")
+                problems[problem_index].inputs.append(int(input_slice))
+                problems[problem_index].raw_inputs.append(input_slice)
                 problem_index += 1
                 this_index = next_index
-            slice = line[this_index:]
-            problems[problem_index].inputs.append(int(slice))
-            problems[problem_index].raw_inputs.append(slice)
+            input_slice = line[this_index:]
+            problems[problem_index].inputs.append(int(input_slice))
+            problems[problem_index].raw_inputs.append(input_slice)
     return problems
 
 
