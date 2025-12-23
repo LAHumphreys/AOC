@@ -22,5 +22,4 @@ class TestDay04(TestCase):
         self.assertEqual(part1(self.data), 13)
 
     def test_part_two(self):
-        # Placeholder test, adjust once problem is known
-        self.assertEqual(part2(self.data), 0)
+        self.assertEqual(part2(self.data), 43)
