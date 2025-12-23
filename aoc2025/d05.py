@@ -5,12 +5,15 @@ class MinMax:
     min: int
     max: int
 
+@dataclass
 class Inventory:
     ranges: list[MinMax]
     items: list[int]
 
-    def __init__(self, ranges: list[MinMax], items: list[int]):
-        sorted_ranges = sorted(ranges, key=lambda r: r.min)
+    def __post_init__(self):
+        if not self.ranges:
+            return
+        sorted_ranges = sorted(self.ranges, key=lambda r: r.min)
         self.ranges = [sorted_ranges[0]]
         for range_ in sorted_ranges[1:]:
             max_range = self.ranges[-1]
@@ -19,7 +22,6 @@ class Inventory:
                     self.ranges[-1].max = range_.max
             else:
                 self.ranges.append(range_)
-        self.items = items
 
     def in_ranges(self, item: int):
         for range_ in self.ranges:
