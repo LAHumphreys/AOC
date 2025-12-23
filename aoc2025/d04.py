@@ -17,17 +17,6 @@ def count_rows(the_map: list[str]) -> list[list[int]]:
                 point_value = row[point_index] + above[point_index] + below[point_index]
             counted_row.append(point_value)
         counted_rows.append(counted_row)
-    print("Computed from map: ")
-    for row in the_map:
-        print("".join(str(row)))
-    print("Individual row counts: ")
-    for row in individual_row_counts:
-        print("".join(str(point) for point in row))
-    print("Results:")
-    for row in counted_rows:
-        print("".join("x" if 0 < point < 5 else "." for point in row ))
-    for row in counted_rows:
-        print("".join(str(point) for point in row))
     return counted_rows
 
 def convert_map_point(point: str):
@@ -40,7 +29,6 @@ def convert_map_point(point: str):
 
 def count_row(row: str) -> list[int]:
     index = -1
-    lhs = 0
     point = 0
     rhs = convert_map_point(row[0])
     result = []
@@ -66,7 +54,27 @@ def part1(data: list[str]) -> int:
 
 
 def part2(data: list[str]) -> int:
-    return len(data)
+    changed = True
+    total = 0
+    while changed:
+        print("Updating Map:")
+        for row in data:
+            print(row)
+        changed = False
+        counted_data = count_rows(data)
+        new_data = []
+        for row_index, row in enumerate(counted_data):
+            new_row = ""
+            for point_index, point in enumerate(row):
+                if 0 < point <= 4:
+                    total += 1
+                    new_row += "."
+                    changed = True
+                else:
+                    new_row += data[row_index][point_index]
+            new_data.append(new_row)
+        data = new_data
+    return total
 
 
 def main():
