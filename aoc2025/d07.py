@@ -47,7 +47,7 @@ def propagate_tachyon(paths: list[str], row_idx: int) -> int:
             skip_next = False
             continue
         map_point = map_row[index]
-        if source_point == "|" or source_point == "S":
+        if source_point in ("|", "S"):
             # NOTE: The input never has two splitter next to each other
             #       note is a splitter ever on the edge
             if map_point == "^":
