@@ -27,4 +27,4 @@ class TestDay07(TestCase):
         self.assertEqual(part1(self.data), 21)
 
     def test_part_two(self):
-        self.assertEqual(part2(self.data), 0)
+        self.assertEqual(part2(self.data), 40)
