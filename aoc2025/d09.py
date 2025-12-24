@@ -8,7 +8,7 @@ class Point:
 
 def load_sample(file: str) -> list[Point]:
     with open(file, "r", encoding="utf-8") as f:
-        return [Point(int(x), int(y)) for x, y in\
+        return [Point(int(x), int(y)) for x, y in
                     (line.strip().split(",") for line in f.readlines())]
 
 def calc_size(point1: Point, point2: Point) -> int:
@@ -20,6 +20,27 @@ def part1(data: list[Point]) -> int:
         for other in data[index+1:]:
             size = calc_size(point, other)
             max_size = max(max_size, size)
+    return max_size
+
+def find_biggest_box_for_side(top: Point, points: list[Point], is_rhs: bool) -> int:
+    points.sort(key=lambda p: p.y)
+    max_size = 0
+    for index, point in enumerate(points):
+        size = calc_size(top, point)
+        if size > max_size:
+            valid = True
+            for other in points[0:index]:
+                if is_rhs:
+                    if other.x <= point.x:
+                        valid = False
+                        break
+                else:
+                    if other.x >= point.x:
+                        valid = False
+                        break
+            if valid:
+                max_size = size
+                print(f"New max size {max_size} at {point}")
     return max_size
 
 def find_biggest_box(top: Point, other_points: list[Point]) -> int:
@@ -37,77 +58,62 @@ def find_biggest_box(top: Point, other_points: list[Point]) -> int:
                 possible_lhs_points.append(point)
             elif point.x > top.x:
                 possible_rhs_points.append(point)
-    possible_rhs_points.sort(key=lambda p: p.y)
-    possible_lhs_points.sort(key=lambda p: p.y)
-    max_size = 0
-    for index, point in enumerate(possible_rhs_points):
-        size = calc_size(top, point)
-        if size > max_size:
-            valid = True
-            for other in possible_rhs_points[0:index]:
-                if other.x <= point.x:
-                    valid = False
-                    break
-            if valid:
-                max_size = size
-                print (f"New max size {max_size} at {point}")
 
-    for index, point in enumerate(possible_lhs_points):
-        size = calc_size(top, point)
-        if size > max_size:
-            valid = True
-            for other in possible_lhs_points[0:index]:
-                if other.x >= point.x:
-                    valid = False
-                    break
-            if valid:
-                max_size = size
-                print (f"New max size {max_size} at {point}")
-    return max_size
+    max_size = find_biggest_box_for_side(top, possible_rhs_points, True)
+    lhs_max = find_biggest_box_for_side(top, possible_lhs_points, False)
+    return max(max_size, lhs_max)
+
+def get_scaled_coords(point: Point, min_x: int, min_y: int,
+                      scalar_x: float, scalar_y: float) -> tuple[int, int]:
+    x = int((point.x - min_x) * scalar_x)
+    y = int((point.y - min_y) * scalar_y)
+    return x, y
+
+def draw_line(rows: list[str], start: tuple[int, int], end: tuple[int, int]):
+    if start[0] == end[0]:  # Vertical line
+        x = start[0]
+        line_y = min(start[1], end[1]) + 1
+        max_y = max(start[1], end[1])
+        while line_y <= max_y and rows[line_y][x] == " ":
+            rows[line_y] = rows[line_y][:x] + "|" + rows[line_y][x+1:]
+            line_y += 1
+    elif start[1] == end[1]:  # Horizontal line
+        y = start[1]
+        line_x = min(start[0], end[0]) + 1
+        max_x = max(start[0], end[0])
+        while line_x <= max_x and rows[y][line_x] == " ":
+            rows[y] = rows[y][:line_x] + "-" + rows[y][line_x+1:]
+            line_x += 1
+    else:
+        raise ValueError("Not a perpendicular line")
+
+def get_grid_scalars(points: list[Point], grid_size: int) -> tuple:
+    min_x = min(p.x for p in points)
+    max_x = max(p.x for p in points)
+    min_y = min(p.y for p in points)
+    max_y = max(p.y for p in points)
+    scalar_x = (grid_size - 1) / (max_x - min_x)
+    scalar_y = (grid_size - 1) / (max_y - min_y)
+    return min_x, min_y, scalar_x, scalar_y
 
 def print_grid(points: list[Point]):
     grid_size = 120
-    max_x = max(points, key=lambda p: p.x).x
-    max_y = max(points, key=lambda p: p.y).y
-    min_x = min(points, key=lambda p: p.x).x
-    min_y = min(points, key=lambda p: p.y).y
-    scalar_x = (grid_size-1) / (max_x - min_x)
-    scalar_y = (grid_size-1) / (max_y - min_y)
-    rows = []
-    row_points = []
-    for i in range(grid_size):
-        rows.append(" "*114 + "X" + " "*(grid_size-114))
-        row_points.append([])
-    last: Optional[tuple[int, int]] = None
-    last_point: Optional[Point] = None
+    min_x, min_y, scalar_x, scalar_y = get_grid_scalars(points, grid_size)
+
+    rows = [" " * 114 + "X" + " " * (grid_size - 114) for _ in range(grid_size)]
+    row_points: list[list[Point]] = [[] for _ in range(grid_size)]
+
+    last_scaled: Optional[tuple[int, int]] = None
     for point in points:
-        x = int((point.x - min_x) * scalar_x)
-        y = int((point.y - min_y) * scalar_y)
-        rows[y] = rows[y][0:x] + "#" + rows[y][x+1:]
+        x, y = get_scaled_coords(point, min_x, min_y, scalar_x, scalar_y)
+        rows[y] = rows[y][:x] + "#" + rows[y][x+1:]
         row_points[y].append(point)
-        if last:
-            if last[0] == x:
-                line_y = min(last[1], y) +1
-                end_y = max(last[1], y)
-                if end_y - line_y > 20:
-                    print(f"Large line: {x, line_y} -> {x, end_y}")
-                    print(f"   From points: {point.x, point.y} -> {last_point.x, last_point.y}")
-                while line_y <= end_y and rows[line_y][x] == " ":
-                    rows[line_y] = rows[line_y][0:x] + "|" + rows[line_y][x+1:]
-                    line_y += 1
-            elif last[1] == y:
-                line_x = min(last[0], x) +1
-                end_x = max(last[0], x)
-                if end_x - line_x > 20:
-                    print(f"Large line: {line_x, y} -> {end_x, y}")
-                    print(f"   From points: {point.x, point.y} -> {last_point.x, last_point.y}")
-                while line_x <= end_x and rows[y][line_x] == " ":
-                    rows[y] = rows[y][0:line_x] + "-" + rows[y][line_x+1:]
-                    line_x += 1
-            else:
-                raise ValueError("Not a perpendicular line")
-        last = (x, y)
-        last_point = point
+
+        if last_scaled:
+            draw_line(rows, last_scaled, (x, y))
+
+        last_scaled = (x, y)
+
     for y, row in enumerate(rows):
         label = f"  : {y}"
         points_in_row = sorted(row_points[y], key=lambda p: p.x)
