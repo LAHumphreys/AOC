@@ -75,7 +75,7 @@ class Circuit:
             lines.append(f"  {conn.start} <-> {conn.end} (distance: {conn.distance:.2f})")
         return "\n".join(lines)
 
-def make_circuits(conns: list[Connection]) -> list[Circuit]:
+def make_circuits(conns: list[Connection], target_points: int) -> list[Circuit]:
     circuits = []
     for i, conn in enumerate(conns):
         debug(f"\nProcessing connection {i+1}/{len(conns)}: {conn.start} <-> {conn.end} ({conn.distance:.2f})")
@@ -100,6 +100,10 @@ def make_circuits(conns: list[Connection]) -> list[Circuit]:
         else:
             debug(f"  Creating new circuit {len(circuits)}")
             circuits.append(Circuit(conn))
+
+        if len(circuits) == 1 and len(circuits[0].points) == target_points:
+            debug(f"Target number of points {target_points} reached: {circuits[0].id}")
+            break
 
     debug(f"\nFinal circuits: {len(circuits)} total")
     for i, circuit in enumerate(circuits):
@@ -141,12 +145,17 @@ def map_points(points: list[Point]) -> ConnectionMap:
 
 def part1(data: list[Point], num_connections: int) -> int:
     conn_map = map_points(data)
-    circuits = make_circuits(conn_map.possible_connections[:num_connections])
+    circuits = make_circuits(conn_map.possible_connections[:num_connections], 999999)
     return len(circuits[0].points) * len(circuits[1].points) * len(circuits[2].points)
 
 
 def part2(data: list[Point]) -> int:
-    return len(data)
+    conn_map = map_points(data)
+    circuits = make_circuits(conn_map.possible_connections, len(data))
+    last_connection = circuits[0].connections[-1]
+    first, second = last_connection.start, last_connection.end
+    debug(f"Final 2 points: {first} and {second}")
+    return first.x * second.x
 
 
 def main():
