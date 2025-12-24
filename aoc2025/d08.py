@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 import math
 
-debug_on = True
+DEBUG_ON = True
+
 
 def debug(msg: str):
-    if debug_on:
+    if DEBUG_ON:
         print(msg)
+
 
 @dataclass(frozen=True)
 class Point:
@@ -23,11 +25,13 @@ class Point:
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.z == other.z
 
+
 @dataclass(frozen=True)
 class Connection:
     distance: float
     start: Point
     end: Point
+
 
 def make_connection(a: Point, b: Point) -> Connection:
     start = min(a, b)
@@ -42,8 +46,10 @@ class ConnectionMap:
     def __post_init__(self):
         self.possible_connections.sort(key=lambda c: c.distance)
 
+
 class Circuit:
     next_id = 0
+
     def __init__(self, conn: Connection):
         self.id = Circuit.next_id
         Circuit.next_id += 1
@@ -75,10 +81,12 @@ class Circuit:
             lines.append(f"  {conn.start} <-> {conn.end} (distance: {conn.distance:.2f})")
         return "\n".join(lines)
 
+
 def make_circuits(conns: list[Connection], target_points: int) -> list[Circuit]:
     circuits = []
     for i, conn in enumerate(conns):
-        debug(f"\nProcessing connection {i+1}/{len(conns)}: {conn.start} <-> {conn.end} ({conn.distance:.2f})")
+        debug(f"\nProcessing connection {i + 1}/{len(conns)}: "
+              f"{conn.start} <-> {conn.end} ({conn.distance:.2f})")
         connecting_circuits: list[Circuit] = []
         for circuit in circuits:
             if circuit.connection_would_connect(conn):
@@ -86,13 +94,16 @@ def make_circuits(conns: list[Connection], target_points: int) -> list[Circuit]:
         if len(connecting_circuits) > 2:
             raise ValueError("Too many circuits found")
         if len(connecting_circuits) == 2:
-            merged_circuit, disabled_circuit = connecting_circuits
-            debug(f"  Circuits {merged_circuit.id} and {disabled_circuit.id} both connect and will be merged")
+            merged_circuit = connecting_circuits[0]
+            disabled_circuit = connecting_circuits[1]
+            debug(f"  Circuits {merged_circuit.id} and {disabled_circuit.id} "
+                  "both connect and will be merged")
             merged_circuit.add_connection(conn)
-            for conn in disabled_circuit.connections:
-                merged_circuit.add_connection(conn, allow_disconnects=True)
+            for moved_conn in disabled_circuit.connections:
+                merged_circuit.add_connection(moved_conn, allow_disconnects=True)
             circuits.remove(disabled_circuit)
-            debug(f"  Merged   circuit {merged_circuit.id} (now {len(merged_circuit.points)} points)")
+            debug(f"  Merged   circuit {merged_circuit.id} "
+                  f"(now {len(merged_circuit.points)} points)")
         elif len(connecting_circuits) == 1:
             circuit = connecting_circuits[0]
             circuit.add_connection(conn)
@@ -107,7 +118,8 @@ def make_circuits(conns: list[Connection], target_points: int) -> list[Circuit]:
 
     debug(f"\nFinal circuits: {len(circuits)} total")
     for i, circuit in enumerate(circuits):
-        debug(f"  Circuit {i}: {len(circuit.points)} points, {len(circuit.connections)} connections")
+        debug(f"  Circuit {i}: {len(circuit.points)} points, "
+              f"{len(circuit.connections)} connections")
 
     return sorted(circuits, key=lambda c: len(c.points), reverse=True)
 
@@ -119,12 +131,13 @@ def load_sample(file: str) -> list[Point]:
             points.append(Point(int(x), int(y), int(z)))
     return points
 
+
 # We've only got a 1000 points. Do it dumb first, and see if its fast enough
 def distance(point_1: Point, point_2: Point) -> float:
     return math.sqrt(
-            (point_1.x - point_2.x)**2 +
-            (point_1.y - point_2.y)**2 +
-            (point_1.z - point_2.z)**2)
+        (point_1.x - point_2.x) ** 2 +
+        (point_1.y - point_2.y) ** 2 +
+        (point_1.z - point_2.z) ** 2)
 
 
 # We've only got a 1000 points. Do it dumb first, and see if its fast enough
@@ -132,12 +145,13 @@ def find_nearest(point: Point, points: list[Point]) -> Point:
     other_points = (x for x in points if x != point)
     return min(other_points, key=lambda p: distance(point, p))
 
+
 def map_points(points: list[Point]) -> ConnectionMap:
     connections = []
 
-    for point_idx in range(len(points)):
-        for other_idx in range(point_idx+1, len(points)):
-            conn = make_connection(points[point_idx], points[other_idx])
+    for point_idx, point in enumerate(points):
+        for other_idx in range(point_idx + 1, len(points)):
+            conn = make_connection(point, points[other_idx])
             connections.append(conn)
 
     return ConnectionMap(possible_connections=connections)
